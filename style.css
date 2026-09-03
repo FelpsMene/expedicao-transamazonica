@@ -1,0 +1,1051 @@
+/* =========================================================
+   EXPEDIÇÃO TRANSAMAZÔNICA: DESAFIO BR-230
+   Estilização Temática CSS3: Amazônia, Barro Vermelho & Aventura
+   ========================================================= */
+
+:root {
+  --color-forest-dark: #092318;
+  --color-forest-mid: #14472f;
+  --color-forest-light: #20724b;
+  --color-amazon-green: #2ecc71;
+  --color-amazon-gold: #f39c12;
+  --color-mud-red: #9e2a0b;
+  --color-mud-dark: #5c1806;
+  --color-dirt-bright: #d35400;
+  --color-water-blue: #2980b9;
+  --color-bg-dark: #0a1410;
+  --color-card-bg: rgba(10, 28, 20, 0.88);
+  --color-card-border: rgba(46, 204, 113, 0.35);
+  --color-text-main: #f0f7f4;
+  --color-text-muted: #95a5a6;
+  --color-danger: #e74c3c;
+  --color-fuel: #f1c40f;
+  
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+  --shadow-neon: 0 0 15px rgba(46, 204, 113, 0.4);
+  --shadow-mud: 0 4px 20px rgba(158, 42, 11, 0.5);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #133a28 0%, #081a12 100%);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-container {
+  width: 100%;
+  max-width: 960px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  position: relative;
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+.game-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge-road {
+  background: linear-gradient(135deg, #d35400, #9e2a0b);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #f39c12;
+  box-shadow: 0 0 8px rgba(243, 156, 18, 0.4);
+  letter-spacing: 1px;
+}
+
+.game-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #fff;
+}
+
+.game-header h1 span {
+  color: var(--color-amazon-green);
+  text-shadow: var(--shadow-neon);
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--color-amazon-green);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   CANVAS WRAPPER & CAMADAS
+   ========================================================= */
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  background: #0d261a;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(46, 204, 113, 0.2);
+  border: 2px solid rgba(46, 204, 113, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: auto;
+}
+
+/* Efeitos Especiais de Tela */
+.screen-fx {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#mud-splatter {
+  background: radial-gradient(circle, rgba(158, 42, 11, 0.35) 10%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#mud-splatter.active {
+  opacity: 0.85;
+}
+
+#rain-overlay {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(41, 128, 185, 0.15) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#rain-overlay.active {
+  opacity: 1;
+}
+
+#flash-overlay {
+  background: white;
+  opacity: 0;
+  transition: opacity 0.08s ease;
+}
+
+#flash-overlay.flash {
+  opacity: 0.7;
+}
+
+/* =========================================================
+   HUD (HEADS-UP DISPLAY)
+   ========================================================= */
+.hud-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  pointer-events: none;
+}
+
+.hud-top, .hud-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.hud-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  pointer-events: auto;
+}
+
+.hud-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+}
+
+/* =========================================================
+   SEMÁFORO DE LARGADA (3, 2, 1, VAI!)
+   ========================================================= */
+.start-lights {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.88);
+  border: 3px solid var(--color-amazon-gold);
+  border-radius: var(--radius-lg);
+  padding: 16px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 60;
+  box-shadow: 0 0 30px rgba(0,0,0,0.9);
+}
+
+.light-group {
+  display: flex;
+  gap: 16px;
+}
+
+.light {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #222;
+  border: 2px solid #444;
+  transition: all 0.15s ease;
+}
+
+.light-red.active {
+  background: #e74c3c;
+  box-shadow: 0 0 20px #e74c3c;
+}
+
+.light-yellow.active {
+  background: #f1c40f;
+  box-shadow: 0 0 20px #f1c40f;
+}
+
+.light-green.active {
+  background: #2ecc71;
+  box-shadow: 0 0 25px #2ecc71;
+}
+
+.countdown-text {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+/* =========================================================
+   HUD DE CORRIDA: POSIÇÃO & MINI-MAPA
+   ========================================================= */
+.position-card {
+  min-width: 90px;
+  text-align: center;
+  border-color: rgba(241, 196, 15, 0.6);
+}
+
+.position-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.pos-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-amazon-gold);
+  line-height: 1;
+}
+
+.pos-total {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Mini-Mapa da Pista BR-230 */
+.race-track-card {
+  flex: 1;
+  max-width: 340px;
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.track-header span:nth-child(2) {
+  color: #fff;
+  font-weight: 700;
+}
+
+.race-minimap {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+}
+
+.track-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%);
+}
+
+.car-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  transition: left 0.1s linear;
+}
+
+.player-dot {
+  background: #2ecc71;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px #2ecc71;
+  z-index: 10;
+  width: 12px;
+  height: 12px;
+}
+
+.ai-dot {
+  background: #e74c3c;
+  border: 1px solid #fff;
+  opacity: 0.85;
+}
+
+.podium-display {
+  margin: 12px 0 16px 0;
+}
+
+.podium-rank {
+  background: linear-gradient(135deg, #f1c40f, #d35400);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+  letter-spacing: 1px;
+}
+
+.weather-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-icon {
+  font-size: 1.3rem;
+}
+
+.eco-card {
+  border-color: rgba(46, 204, 113, 0.6);
+}
+
+.eco-card .hud-value {
+  color: var(--color-amazon-green);
+}
+
+/* HUD Bottom: Velocímetro e Barras */
+.speed-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+}
+
+.speed-digital {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.speed-digital #speed-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.speed-digital .unit {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.status-pill {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+
+.status-normal {
+  background: rgba(46, 204, 113, 0.25);
+  color: var(--color-amazon-green);
+  border: 1px solid var(--color-amazon-green);
+}
+
+.status-mud {
+  background: rgba(158, 42, 11, 0.85);
+  color: #fff;
+  border: 1px solid #f39c12;
+  animation: pulse 0.5s infinite alternate;
+}
+
+.status-boost {
+  background: rgba(241, 196, 15, 0.85);
+  color: #000;
+  border: 1px solid #fff;
+  animation: pulse 0.3s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(0.95); }
+  to { transform: scale(1.05); }
+}
+
+.stats-card {
+  display: flex;
+  gap: 16px;
+  min-width: 240px;
+}
+
+.stat-gauge {
+  flex: 1;
+}
+
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  margin-bottom: 3px;
+  color: var(--color-text-muted);
+}
+
+.gauge-header span:last-child {
+  color: #fff;
+  font-weight: 700;
+}
+
+.gauge-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.gauge-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.2s ease, background 0.3s ease;
+}
+
+.fuel-fill {
+  background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71);
+}
+
+.health-fill {
+  background: linear-gradient(90deg, #e74c3c, #2ecc71);
+}
+
+/* Alerta Flutuante de Evento */
+.floating-alert {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 20, 15, 0.92);
+  border: 2px solid var(--color-amazon-gold);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 0 25px rgba(243, 156, 18, 0.6);
+  animation: floatFade 1.8s forwards;
+  pointer-events: none;
+  text-align: center;
+}
+
+@keyframes floatFade {
+  0% { opacity: 0; transform: translate(-50%, -20%) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9); }
+}
+
+/* =========================================================
+   TELA DE GARAGEM / MENU E OVERLAYS
+   ========================================================= */
+.overlay-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 20, 14, 0.94);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.menu-content {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.menu-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--color-amazon-green);
+  text-shadow: var(--shadow-neon);
+}
+
+.menu-header p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* Seletor de Carros */
+.garage-selector {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nav-arrow {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: var(--color-amazon-green);
+  font-size: 1.6rem;
+  width: 44px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-arrow:hover {
+  background: var(--color-amazon-green);
+  color: #000;
+  box-shadow: var(--shadow-neon);
+  transform: scale(1.08);
+}
+
+.vehicle-display-card {
+  flex: 1;
+  background: rgba(14, 40, 28, 0.9);
+  border: 2px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.vehicle-preview-box {
+  background: radial-gradient(circle, #1a5336 0%, #0a2015 100%);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#vehiclePreviewCanvas {
+  display: block;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.vehicle-title-wrap h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.car-badge {
+  background: #d35400;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.car-description {
+  font-size: 0.78rem;
+  color: #d1d8e0;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.car-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.attr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.attr-bar {
+  width: 110px;
+  height: 6px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.attr-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f39c12, #2ecc71);
+  border-radius: 3px;
+  width: 50%;
+  transition: width 0.3s ease;
+}
+
+.car-special {
+  font-size: 0.72rem;
+  background: rgba(46, 204, 113, 0.12);
+  border-left: 3px solid var(--color-amazon-green);
+  padding: 4px 8px;
+  border-radius: 0 4px 4px 0;
+  color: #e0f2e9;
+}
+
+/* Guia de Controles */
+.controls-guide {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #ced6e0;
+}
+
+.key-pill {
+  background: #1b2820;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-amazon-green);
+}
+
+/* Botões de Ação */
+.btn-primary {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: #051a0e;
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 12px 36px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.7);
+  background: linear-gradient(135deg, #2ecc71, #a8e6cf);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Modais Gerais */
+.modal-card {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-icon {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.modal-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.modal-card p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.final-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.highlight-box {
+  border-color: rgba(46, 204, 113, 0.5);
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.highlight-box .stat-num {
+  color: var(--color-amazon-green);
+}
+
+.record-badge {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-amazon-gold);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Modal Informativo */
+.info-card {
+  max-width: 600px;
+  text-align: left;
+}
+
+.info-content {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #d1d8e0;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* =========================================================
+   CONTROLES TOUCH MOBILE
+   ========================================================= */
+.touch-controls {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.touch-left, .touch-right {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(14, 40, 28, 0.85);
+  border: 2px solid var(--color-amazon-green);
+  color: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  touch-action: manipulation;
+}
+
+.touch-btn:active {
+  background: var(--color-amazon-green);
+  color: #000;
+  transform: scale(0.92);
+}
+
+.touch-gas {
+  background: rgba(46, 204, 113, 0.8);
+  color: #000;
+  font-weight: 800;
+}
+
+.touch-brake {
+  background: rgba(231, 76, 60, 0.8);
+}
+
+.touch-horn {
+  background: rgba(243, 156, 18, 0.8);
+}
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+.game-footer {
+  width: 100%;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  padding: 8px;
+}
+
+.game-footer strong {
+  color: var(--color-amazon-green);
+}
+
+/* =========================================================
+   RESPONSIVIDADE (MOBILE & TABLET)
+   ========================================================= */
+@media (max-width: 768px) {
+  .game-header h1 {
+    font-size: 1rem;
+  }
+  
+  .badge-road {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+  
+  .vehicle-display-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .vehicle-title-wrap {
+    justify-content: center;
+  }
+  
+  .car-attributes {
+    max-width: 240px;
+    margin: 0 auto 8px auto;
+  }
+  
+  .hud-top {
+    flex-direction: row;
+  }
+  
+  .road-progress {
+    max-width: 180px;
+  }
+  
+  .stats-card {
+    min-width: 180px;
+    gap: 8px;
+  }
+  
+  .speed-digital #speed-val {
+    font-size: 1.5rem;
+  }
+}

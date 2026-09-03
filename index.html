@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Expedição Transamazônica: Desafio BR-230 - Jogo de corrida e sobrevivência ecológica na maior floresta tropical do mundo.">
+  <title>Expedição Transamazônica: Desafio BR-230</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;800&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Cabeçalho / Topbar -->
+    <header class="game-header">
+      <div class="header-logo">
+        <span class="badge-road">BR-230</span>
+        <h1>RALLY <span>TRANSAMAZÔNICA</span></h1>
+      </div>
+      <div class="header-controls">
+        <button id="btn-sound" class="btn-icon" title="Ativar/Desativar Som" aria-label="Som">
+          🔊
+        </button>
+        <button id="btn-info" class="btn-icon" title="Sobre a Corrida e a Amazônia" aria-label="Informações">
+          ℹ️
+        </button>
+      </div>
+    </header>
+
+    <!-- Canvas do Jogo -->
+    <div class="canvas-wrapper">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      
+      <!-- Semáforo de Largada (3, 2, 1, VAI!) -->
+      <div id="start-lights" class="start-lights hidden">
+        <div class="light-group">
+          <div class="light light-red" id="light-1"></div>
+          <div class="light light-yellow" id="light-2"></div>
+          <div class="light light-green" id="light-3"></div>
+        </div>
+        <div id="countdown-text" class="countdown-text">3</div>
+      </div>
+
+      <!-- Efeitos Climáticos / Efeitos de Tela -->
+      <div id="mud-splatter" class="screen-fx"></div>
+      <div id="rain-overlay" class="screen-fx"></div>
+      <div id="flash-overlay" class="screen-fx"></div>
+
+      <!-- HUD Dinâmico Sobreposto no Canvas (Modo Corrida) -->
+      <div id="game-hud" class="hud-container hidden">
+        <div class="hud-top">
+          <!-- Posição na Corrida (1º ao 5º) -->
+          <div class="hud-card position-card">
+            <span class="hud-label">POSIÇÃO</span>
+            <div class="position-display">
+              <span id="pos-val" class="pos-num">1º</span>
+              <span class="pos-total">/ 5</span>
+            </div>
+          </div>
+
+          <!-- Mini-Mapa da Corrida (Posição dos 5 Carros) -->
+          <div class="hud-card race-track-card">
+            <div class="track-header">
+              <span>LARGADA</span>
+              <span id="checkpoint-text">Trecho BR-230 • 0.0 km</span>
+              <span>CHEGADA 🏁</span>
+            </div>
+            <div class="race-minimap" id="race-minimap">
+              <div class="track-line"></div>
+              <div id="car-dot-player" class="car-dot player-dot" title="Você"></div>
+              <div id="car-dot-1" class="car-dot ai-dot" title="Rival 1"></div>
+              <div id="car-dot-2" class="car-dot ai-dot" title="Rival 2"></div>
+              <div id="car-dot-3" class="car-dot ai-dot" title="Rival 3"></div>
+              <div id="car-dot-4" class="car-dot ai-dot" title="Rival 4"></div>
+            </div>
+          </div>
+
+          <!-- Mudas Salvas (Pontuação Ecológica) -->
+          <div class="hud-card eco-card">
+            <span class="hud-label">MUDAS COLETADAS</span>
+            <span class="hud-value"><span id="seed-counter">0</span> 🌱</span>
+          </div>
+        </div>
+
+        <div class="hud-bottom">
+          <!-- Velocímetro e Marcha/Tração -->
+          <div class="hud-card speed-card">
+            <div class="speed-digital">
+              <span id="speed-val">0</span>
+              <span class="unit">KM/H</span>
+            </div>
+            <div id="traction-warning" class="status-pill status-normal">PISTA SECA</div>
+          </div>
+
+          <!-- Indicadores de Combustível e Integridade -->
+          <div class="hud-card stats-card">
+            <!-- Combustível -->
+            <div class="stat-gauge">
+              <div class="gauge-header">
+                <span>⛽ BIO-COMBUSTÍVEL</span>
+                <span id="fuel-val">100%</span>
+              </div>
+              <div class="gauge-bar">
+                <div id="fuel-bar-fill" class="gauge-fill fuel-fill"></div>
+              </div>
+            </div>
+
+            <!-- Integridade do Carro -->
+            <div class="stat-gauge">
+              <div class="gauge-header">
+                <span>🛠️ INTEGRIDADE</span>
+                <span id="health-val">100%</span>
+              </div>
+              <div class="gauge-bar">
+                <div id="health-bar-fill" class="gauge-fill health-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerta Flutuante de Eventos / Bônus -->
+        <div id="floating-alert" class="floating-alert hidden"></div>
+      </div>
+
+      <!-- Controles Virtuais Touch (Mobile / Telas Touch) -->
+      <div id="touch-controls" class="touch-controls hidden">
+        <div class="touch-left">
+          <button id="btn-left" class="touch-btn" aria-label="Esquerda">◀</button>
+          <button id="btn-right" class="touch-btn" aria-label="Direita">▶</button>
+        </div>
+        <div class="touch-right">
+          <button id="btn-horn" class="touch-btn touch-horn" aria-label="Buzina / Ação">📢</button>
+          <button id="btn-brake" class="touch-btn touch-brake" aria-label="Freio">🛑</button>
+          <button id="btn-gas" class="touch-btn touch-gas" aria-label="Acelerar">⚡</button>
+        </div>
+      </div>
+
+      <!-- TELA DE GARAGEM / MENU PRINCIPAL -->
+      <div id="menu-screen" class="overlay-screen">
+        <div class="menu-content">
+          <div class="menu-header">
+            <h2>ESCOLHA SEU VEÍCULO PARA O RALLY BR-230</h2>
+            <p>Dispute o 1º lugar contra os maiores mitos do automobilismo brasileiro na Transamazônica!</p>
+          </div>
+
+          <!-- Seletor de Carros / Garagem -->
+          <div class="garage-selector">
+            <button id="btn-prev-car" class="nav-arrow" aria-label="Veículo Anterior">❮</button>
+            
+            <div class="vehicle-display-card">
+              <div class="vehicle-preview-box">
+                <canvas id="vehiclePreviewCanvas" width="220" height="150"></canvas>
+              </div>
+              <div class="vehicle-info">
+                <div class="vehicle-title-wrap">
+                  <h3 id="car-name">Uno Mille com Escada</h3>
+                  <span id="car-tag" class="car-badge">O LENDÁRIO</span>
+                </div>
+                <p id="car-desc" class="car-description">
+                  Veloz, ágil e munido com a mística escada no teto. Ativa o Modo Firma (Nitro), mas exige cuidado nas crateras.
+                </p>
+                
+                <!-- Barras de Atributos -->
+                <div class="car-attributes">
+                  <div class="attr-row">
+                    <span>Velocidade Máxima:</span>
+                    <div class="attr-bar"><div id="attr-speed" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Tração no Barro:</span>
+                    <div class="attr-bar"><div id="attr-traction" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Resistência (HP):</span>
+                    <div class="attr-bar"><div id="attr-durability" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Econ. Combustível:</span>
+                    <div class="attr-bar"><div id="attr-fuel" class="attr-fill"></div></div>
+                  </div>
+                </div>
+
+                <div class="car-special">
+                  <strong>Habilidade de Corrida:</strong> <span id="car-ability">Modo Firma (Super Aceleração temporária com ESPAÇO)</span>
+                </div>
+              </div>
+            </div>
+
+            <button id="btn-next-car" class="nav-arrow" aria-label="Próximo Veículo">❯</button>
+          </div>
+
+          <!-- Mini Guia de Controles -->
+          <div class="controls-guide">
+            <div class="guide-item">
+              <span class="key-pill">⬆️ / W</span> Acelerar
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">⬇️ / S</span> Ré / Freio
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">⬅️ ➡️ / A D</span> Direção / Ultrapassagem
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">ESPAÇO</span> Buzina / Nitro
+            </div>
+          </div>
+
+          <div class="menu-actions">
+            <button id="btn-start" class="btn-primary">LARGAR NO RALLY! 🚦🏁</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE PAUSA -->
+      <div id="pause-screen" class="overlay-screen hidden">
+        <div class="modal-card">
+          <h2>CORRIDA PAUSADA</h2>
+          <p>Você encostou no acostamento da BR-230.</p>
+          <div class="modal-buttons">
+            <button id="btn-resume" class="btn-primary">CONTINUAR CORRIDA ▶️</button>
+            <button id="btn-quit" class="btn-secondary">VOLTAR À GARAGEM 🚪</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE GAME OVER / DERROTA -->
+      <div id="gameover-screen" class="overlay-screen hidden">
+        <div class="modal-card gameover-card">
+          <div class="modal-icon">⚠️</div>
+          <h2 id="gameover-title">FIM DE CORRIDA!</h2>
+          <p id="gameover-reason">Seu veículo quebrou devido às crateras da Transamazônica.</p>
+
+          <div class="final-stats-grid">
+            <div class="stat-box">
+              <span class="stat-num" id="stat-dist">0 km</span>
+              <span class="stat-label">Distância Percorrida</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="stat-seeds">0</span>
+              <span class="stat-label">Mudas Salvas</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="stat-fauna">0</span>
+              <span class="stat-label">Animais Respeitados</span>
+            </div>
+            <div class="stat-box highlight-box">
+              <span class="stat-num" id="stat-score">0</span>
+              <span class="stat-label">Pontuação Total</span>
+            </div>
+          </div>
+
+          <div class="record-badge">
+            🏆 Melhor Corrida: <span id="stat-record">0 pts</span>
+          </div>
+
+          <div class="modal-buttons">
+            <button id="btn-retry" class="btn-primary">CORRER NOVAMENTE 🔄</button>
+            <button id="btn-garage-return" class="btn-secondary">TROCAR CARRO 🚗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE VITÓRIA / PÓDIO DE CORRIDA -->
+      <div id="victory-screen" class="overlay-screen hidden">
+        <div class="modal-card victory-card">
+          <div class="modal-icon" id="vic-trophy">🏆</div>
+          <h2 id="vic-title">CHEGADA EM 1º LUGAR!</h2>
+          <p id="vic-subtitle">Você cruzou a linha de chegada na Base de Altamira como o Campeão da Transamazônica!</p>
+
+          <div class="podium-display">
+            <div class="podium-rank" id="vic-badge">🥇 CAMPEÃO DA BR-230</div>
+          </div>
+
+          <div class="final-stats-grid">
+            <div class="stat-box">
+              <span class="stat-num" id="vic-time">00:00</span>
+              <span class="stat-label">Tempo de Corrida</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="vic-seeds">0</span>
+              <span class="stat-label">Mudas Coletadas</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="vic-fauna">0</span>
+              <span class="stat-label">Fauna Preservada</span>
+            </div>
+            <div class="stat-box highlight-box">
+              <span class="stat-num" id="vic-score">0</span>
+              <span class="stat-label">Pontuação do Pódio</span>
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button id="btn-play-again" class="btn-primary">CORRER DE NOVO 🌟</button>
+            <button id="btn-vic-garage" class="btn-secondary">GARAGEM DE CARROS 🚗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL DE INFORMAÇÕES E HISTÓRIA DO JOGO -->
+      <div id="info-modal" class="overlay-screen hidden">
+        <div class="modal-card info-card">
+          <h2>🌿 Sobre a Expedição Transamazônica</h2>
+          <div class="info-content">
+            <p><strong>A Rodovia BR-230 (Transamazônica)</strong> é uma das estradas mais emblemáticas do Brasil. Cortando a densa floresta tropical, ela conecta comunidades isoladas mas enfrenta desafios colossais: chuvas torrenciais, atoleiros de barro vermelho e travessias perigosas de pontes sobre igarapés.</p>
+            <p><strong>🌱 Objetivo Ecológico:</strong> Neste jogo, sua missão vai além da velocidade. Você transporta sementes e mudas nativas para reflorestamento e deve dirigir com consciência ambiental, respeitando os animais que cruzam a pista (antas, capivaras, jacarés e preguiças).</p>
+            <p><strong>🚜 Os Veículos Brasileiros:</strong> Escolha entre ícones automotivos como o clássico <em>Uno Mille com escada</em>, o valente <em>Fusca Baja 1974</em>, a robusta <em>Camionete D20 4x4</em>, o histórico <em>Jeep Willys</em> ou o imponente <em>Caminhão Mercedes-Benz 1113 Trucado</em>!</p>
+          </div>
+          <button id="btn-close-info" class="btn-primary">FECHAR ✖</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé Semântico -->
+    <footer class="game-footer">
+      <p>Desenvolvido para o <strong>Desafio Web Games • Missão Amazônia Criativa</strong> | HTML5 Canvas, CSS3 e JavaScript Puro.</p>
+    </footer>
+  </div>
+
+  <!-- Scripts do Jogo Modularizados -->
+  <script src="js/audio.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/obstacles.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

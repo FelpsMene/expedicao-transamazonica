@@ -1,0 +1,4030 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Expedição Transamazônica: Desafio BR-230 - Jogo de corrida e sobrevivência ecológica na maior floresta tropical do mundo.">
+  <title>Expedição Transamazônica: Desafio BR-230</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700;800&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+/* =========================================================
+   EXPEDIÇÃO TRANSAMAZÔNICA: DESAFIO BR-230
+   Estilização Temática CSS3: Amazônia, Barro Vermelho & Aventura
+   ========================================================= */
+
+:root {
+  --color-forest-dark: #092318;
+  --color-forest-mid: #14472f;
+  --color-forest-light: #20724b;
+  --color-amazon-green: #2ecc71;
+  --color-amazon-gold: #f39c12;
+  --color-mud-red: #9e2a0b;
+  --color-mud-dark: #5c1806;
+  --color-dirt-bright: #d35400;
+  --color-water-blue: #2980b9;
+  --color-bg-dark: #0a1410;
+  --color-card-bg: rgba(10, 28, 20, 0.88);
+  --color-card-border: rgba(46, 204, 113, 0.35);
+  --color-text-main: #f0f7f4;
+  --color-text-muted: #95a5a6;
+  --color-danger: #e74c3c;
+  --color-fuel: #f1c40f;
+  
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+  --shadow-neon: 0 0 15px rgba(46, 204, 113, 0.4);
+  --shadow-mud: 0 4px 20px rgba(158, 42, 11, 0.5);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #133a28 0%, #081a12 100%);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-container {
+  width: 100%;
+  max-width: 960px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  position: relative;
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+.game-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge-road {
+  background: linear-gradient(135deg, #d35400, #9e2a0b);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #f39c12;
+  box-shadow: 0 0 8px rgba(243, 156, 18, 0.4);
+  letter-spacing: 1px;
+}
+
+.game-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #fff;
+}
+
+.game-header h1 span {
+  color: var(--color-amazon-green);
+  text-shadow: var(--shadow-neon);
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--color-amazon-green);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   CANVAS WRAPPER & CAMADAS
+   ========================================================= */
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 4 / 3;
+  background: #0d261a;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(46, 204, 113, 0.2);
+  border: 2px solid rgba(46, 204, 113, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: auto;
+}
+
+/* Efeitos Especiais de Tela */
+.screen-fx {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#mud-splatter {
+  background: radial-gradient(circle, rgba(158, 42, 11, 0.35) 10%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#mud-splatter.active {
+  opacity: 0.85;
+}
+
+#rain-overlay {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(41, 128, 185, 0.15) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#rain-overlay.active {
+  opacity: 1;
+}
+
+#flash-overlay {
+  background: white;
+  opacity: 0;
+  transition: opacity 0.08s ease;
+}
+
+#flash-overlay.flash {
+  opacity: 0.7;
+}
+
+/* =========================================================
+   HUD (HEADS-UP DISPLAY)
+   ========================================================= */
+.hud-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  pointer-events: none;
+}
+
+.hud-top, .hud-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.hud-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  pointer-events: auto;
+}
+
+.hud-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+}
+
+/* =========================================================
+   SEMÁFORO DE LARGADA (3, 2, 1, VAI!)
+   ========================================================= */
+.start-lights {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.88);
+  border: 3px solid var(--color-amazon-gold);
+  border-radius: var(--radius-lg);
+  padding: 16px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 60;
+  box-shadow: 0 0 30px rgba(0,0,0,0.9);
+}
+
+.light-group {
+  display: flex;
+  gap: 16px;
+}
+
+.light {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #222;
+  border: 2px solid #444;
+  transition: all 0.15s ease;
+}
+
+.light-red.active {
+  background: #e74c3c;
+  box-shadow: 0 0 20px #e74c3c;
+}
+
+.light-yellow.active {
+  background: #f1c40f;
+  box-shadow: 0 0 20px #f1c40f;
+}
+
+.light-green.active {
+  background: #2ecc71;
+  box-shadow: 0 0 25px #2ecc71;
+}
+
+.countdown-text {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+/* =========================================================
+   HUD DE CORRIDA: POSIÇÃO & MINI-MAPA
+   ========================================================= */
+.position-card {
+  min-width: 90px;
+  text-align: center;
+  border-color: rgba(241, 196, 15, 0.6);
+}
+
+.position-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.pos-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-amazon-gold);
+  line-height: 1;
+}
+
+.pos-total {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Mini-Mapa da Pista BR-230 */
+.race-track-card {
+  flex: 1;
+  max-width: 340px;
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.track-header span:nth-child(2) {
+  color: #fff;
+  font-weight: 700;
+}
+
+.race-minimap {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+}
+
+.track-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%);
+}
+
+.car-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, 0);
+  transition: left 0.1s linear;
+}
+
+.player-dot {
+  background: #2ecc71;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px #2ecc71;
+  z-index: 10;
+  width: 12px;
+  height: 12px;
+}
+
+.ai-dot {
+  background: #e74c3c;
+  border: 1px solid #fff;
+  opacity: 0.85;
+}
+
+.podium-display {
+  margin: 12px 0 16px 0;
+}
+
+.podium-rank {
+  background: linear-gradient(135deg, #f1c40f, #d35400);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+  letter-spacing: 1px;
+}
+
+.weather-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-icon {
+  font-size: 1.3rem;
+}
+
+.eco-card {
+  border-color: rgba(46, 204, 113, 0.6);
+}
+
+.eco-card .hud-value {
+  color: var(--color-amazon-green);
+}
+
+/* HUD Bottom: Velocímetro e Barras */
+.speed-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+}
+
+.speed-digital {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.speed-digital #speed-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.speed-digital .unit {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.status-pill {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+
+.status-normal {
+  background: rgba(46, 204, 113, 0.25);
+  color: var(--color-amazon-green);
+  border: 1px solid var(--color-amazon-green);
+}
+
+.status-mud {
+  background: rgba(158, 42, 11, 0.85);
+  color: #fff;
+  border: 1px solid #f39c12;
+  animation: pulse 0.5s infinite alternate;
+}
+
+.status-boost {
+  background: rgba(241, 196, 15, 0.85);
+  color: #000;
+  border: 1px solid #fff;
+  animation: pulse 0.3s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(0.95); }
+  to { transform: scale(1.05); }
+}
+
+.stats-card {
+  display: flex;
+  gap: 16px;
+  min-width: 240px;
+}
+
+.stat-gauge {
+  flex: 1;
+}
+
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  margin-bottom: 3px;
+  color: var(--color-text-muted);
+}
+
+.gauge-header span:last-child {
+  color: #fff;
+  font-weight: 700;
+}
+
+.gauge-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.gauge-fill {
+  height: 100%;
+  width: 100%;
+  transition: width 0.2s ease, background 0.3s ease;
+}
+
+.fuel-fill {
+  background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71);
+}
+
+.health-fill {
+  background: linear-gradient(90deg, #e74c3c, #2ecc71);
+}
+
+/* Alerta Flutuante de Evento */
+.floating-alert {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 20, 15, 0.92);
+  border: 2px solid var(--color-amazon-gold);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 0 25px rgba(243, 156, 18, 0.6);
+  animation: floatFade 1.8s forwards;
+  pointer-events: none;
+  text-align: center;
+}
+
+@keyframes floatFade {
+  0% { opacity: 0; transform: translate(-50%, -20%) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.9); }
+}
+
+/* =========================================================
+   TELA DE GARAGEM / MENU E OVERLAYS
+   ========================================================= */
+.overlay-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 20, 14, 0.94);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.menu-content {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.menu-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--color-amazon-green);
+  text-shadow: var(--shadow-neon);
+}
+
+.menu-header p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* Seletor de Carros */
+.garage-selector {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nav-arrow {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(46, 204, 113, 0.4);
+  color: var(--color-amazon-green);
+  font-size: 1.6rem;
+  width: 44px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-arrow:hover {
+  background: var(--color-amazon-green);
+  color: #000;
+  box-shadow: var(--shadow-neon);
+  transform: scale(1.08);
+}
+
+.vehicle-display-card {
+  flex: 1;
+  background: rgba(14, 40, 28, 0.9);
+  border: 2px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.vehicle-preview-box {
+  background: radial-gradient(circle, #1a5336 0%, #0a2015 100%);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#vehiclePreviewCanvas {
+  display: block;
+}
+
+.vehicle-info {
+  flex: 1;
+}
+
+.vehicle-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.vehicle-title-wrap h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.car-badge {
+  background: #d35400;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.car-description {
+  font-size: 0.78rem;
+  color: #d1d8e0;
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.car-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.attr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.attr-bar {
+  width: 110px;
+  height: 6px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.attr-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f39c12, #2ecc71);
+  border-radius: 3px;
+  width: 50%;
+  transition: width 0.3s ease;
+}
+
+.car-special {
+  font-size: 0.72rem;
+  background: rgba(46, 204, 113, 0.12);
+  border-left: 3px solid var(--color-amazon-green);
+  padding: 4px 8px;
+  border-radius: 0 4px 4px 0;
+  color: #e0f2e9;
+}
+
+/* Guia de Controles */
+.controls-guide {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #ced6e0;
+}
+
+.key-pill {
+  background: #1b2820;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-amazon-green);
+}
+
+/* Botões de Ação */
+.btn-primary {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: #051a0e;
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 12px 36px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(46, 204, 113, 0.7);
+  background: linear-gradient(135deg, #2ecc71, #a8e6cf);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Modais Gerais */
+.modal-card {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-icon {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.modal-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.modal-card p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.final-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.highlight-box {
+  border-color: rgba(46, 204, 113, 0.5);
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.highlight-box .stat-num {
+  color: var(--color-amazon-green);
+}
+
+.record-badge {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-amazon-gold);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Modal Informativo */
+.info-card {
+  max-width: 600px;
+  text-align: left;
+}
+
+.info-content {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #d1d8e0;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* =========================================================
+   CONTROLES TOUCH MOBILE
+   ========================================================= */
+.touch-controls {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.touch-left, .touch-right {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.touch-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(14, 40, 28, 0.85);
+  border: 2px solid var(--color-amazon-green);
+  color: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  touch-action: manipulation;
+}
+
+.touch-btn:active {
+  background: var(--color-amazon-green);
+  color: #000;
+  transform: scale(0.92);
+}
+
+.touch-gas {
+  background: rgba(46, 204, 113, 0.8);
+  color: #000;
+  font-weight: 800;
+}
+
+.touch-brake {
+  background: rgba(231, 76, 60, 0.8);
+}
+
+.touch-horn {
+  background: rgba(243, 156, 18, 0.8);
+}
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+.game-footer {
+  width: 100%;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  padding: 8px;
+}
+
+.game-footer strong {
+  color: var(--color-amazon-green);
+}
+
+/* =========================================================
+   RESPONSIVIDADE (MOBILE & TABLET)
+   ========================================================= */
+@media (max-width: 768px) {
+  .game-header h1 {
+    font-size: 1rem;
+  }
+  
+  .badge-road {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+  
+  .vehicle-display-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .vehicle-title-wrap {
+    justify-content: center;
+  }
+  
+  .car-attributes {
+    max-width: 240px;
+    margin: 0 auto 8px auto;
+  }
+  
+  .hud-top {
+    flex-direction: row;
+  }
+  
+  .road-progress {
+    max-width: 180px;
+  }
+  
+  .stats-card {
+    min-width: 180px;
+    gap: 8px;
+  }
+  
+  .speed-digital #speed-val {
+    font-size: 1.5rem;
+  }
+}
+
+</style>
+</head>
+<body>
+  <div id="game-container">
+    <!-- Cabeçalho / Topbar -->
+    <header class="game-header">
+      <div class="header-logo">
+        <span class="badge-road">BR-230</span>
+        <h1>RALLY <span>TRANSAMAZÔNICA</span></h1>
+      </div>
+      <div class="header-controls">
+        <button id="btn-sound" class="btn-icon" title="Ativar/Desativar Som" aria-label="Som">
+          🔊
+        </button>
+        <button id="btn-info" class="btn-icon" title="Sobre a Corrida e a Amazônia" aria-label="Informações">
+          ℹ️
+        </button>
+      </div>
+    </header>
+
+    <!-- Canvas do Jogo -->
+    <div class="canvas-wrapper">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      
+      <!-- Semáforo de Largada (3, 2, 1, VAI!) -->
+      <div id="start-lights" class="start-lights hidden">
+        <div class="light-group">
+          <div class="light light-red" id="light-1"></div>
+          <div class="light light-yellow" id="light-2"></div>
+          <div class="light light-green" id="light-3"></div>
+        </div>
+        <div id="countdown-text" class="countdown-text">3</div>
+      </div>
+
+      <!-- Efeitos Climáticos / Efeitos de Tela -->
+      <div id="mud-splatter" class="screen-fx"></div>
+      <div id="rain-overlay" class="screen-fx"></div>
+      <div id="flash-overlay" class="screen-fx"></div>
+
+      <!-- HUD Dinâmico Sobreposto no Canvas (Modo Corrida) -->
+      <div id="game-hud" class="hud-container hidden">
+        <div class="hud-top">
+          <!-- Posição na Corrida (1º ao 5º) -->
+          <div class="hud-card position-card">
+            <span class="hud-label">POSIÇÃO</span>
+            <div class="position-display">
+              <span id="pos-val" class="pos-num">1º</span>
+              <span class="pos-total">/ 5</span>
+            </div>
+          </div>
+
+          <!-- Mini-Mapa da Corrida (Posição dos 5 Carros) -->
+          <div class="hud-card race-track-card">
+            <div class="track-header">
+              <span>LARGADA</span>
+              <span id="checkpoint-text">Trecho BR-230 • 0.0 km</span>
+              <span>CHEGADA 🏁</span>
+            </div>
+            <div class="race-minimap" id="race-minimap">
+              <div class="track-line"></div>
+              <div id="car-dot-player" class="car-dot player-dot" title="Você"></div>
+              <div id="car-dot-1" class="car-dot ai-dot" title="Rival 1"></div>
+              <div id="car-dot-2" class="car-dot ai-dot" title="Rival 2"></div>
+              <div id="car-dot-3" class="car-dot ai-dot" title="Rival 3"></div>
+              <div id="car-dot-4" class="car-dot ai-dot" title="Rival 4"></div>
+            </div>
+          </div>
+
+          <!-- Mudas Salvas (Pontuação Ecológica) -->
+          <div class="hud-card eco-card">
+            <span class="hud-label">MUDAS COLETADAS</span>
+            <span class="hud-value"><span id="seed-counter">0</span> 🌱</span>
+          </div>
+        </div>
+
+        <div class="hud-bottom">
+          <!-- Velocímetro e Marcha/Tração -->
+          <div class="hud-card speed-card">
+            <div class="speed-digital">
+              <span id="speed-val">0</span>
+              <span class="unit">KM/H</span>
+            </div>
+            <div id="traction-warning" class="status-pill status-normal">PISTA SECA</div>
+          </div>
+
+          <!-- Indicadores de Combustível e Integridade -->
+          <div class="hud-card stats-card">
+            <!-- Combustível -->
+            <div class="stat-gauge">
+              <div class="gauge-header">
+                <span>⛽ BIO-COMBUSTÍVEL</span>
+                <span id="fuel-val">100%</span>
+              </div>
+              <div class="gauge-bar">
+                <div id="fuel-bar-fill" class="gauge-fill fuel-fill"></div>
+              </div>
+            </div>
+
+            <!-- Integridade do Carro -->
+            <div class="stat-gauge">
+              <div class="gauge-header">
+                <span>🛠️ INTEGRIDADE</span>
+                <span id="health-val">100%</span>
+              </div>
+              <div class="gauge-bar">
+                <div id="health-bar-fill" class="gauge-fill health-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerta Flutuante de Eventos / Bônus -->
+        <div id="floating-alert" class="floating-alert hidden"></div>
+      </div>
+
+      <!-- Controles Virtuais Touch (Mobile / Telas Touch) -->
+      <div id="touch-controls" class="touch-controls hidden">
+        <div class="touch-left">
+          <button id="btn-left" class="touch-btn" aria-label="Esquerda">◀</button>
+          <button id="btn-right" class="touch-btn" aria-label="Direita">▶</button>
+        </div>
+        <div class="touch-right">
+          <button id="btn-horn" class="touch-btn touch-horn" aria-label="Buzina / Ação">📢</button>
+          <button id="btn-brake" class="touch-btn touch-brake" aria-label="Freio">🛑</button>
+          <button id="btn-gas" class="touch-btn touch-gas" aria-label="Acelerar">⚡</button>
+        </div>
+      </div>
+
+      <!-- TELA DE GARAGEM / MENU PRINCIPAL -->
+      <div id="menu-screen" class="overlay-screen">
+        <div class="menu-content">
+          <div class="menu-header">
+            <h2>ESCOLHA SEU VEÍCULO PARA O RALLY BR-230</h2>
+            <p>Dispute o 1º lugar contra os maiores mitos do automobilismo brasileiro na Transamazônica!</p>
+          </div>
+
+          <!-- Seletor de Carros / Garagem -->
+          <div class="garage-selector">
+            <button id="btn-prev-car" class="nav-arrow" aria-label="Veículo Anterior">❮</button>
+            
+            <div class="vehicle-display-card">
+              <div class="vehicle-preview-box">
+                <canvas id="vehiclePreviewCanvas" width="220" height="150"></canvas>
+              </div>
+              <div class="vehicle-info">
+                <div class="vehicle-title-wrap">
+                  <h3 id="car-name">Uno Mille com Escada</h3>
+                  <span id="car-tag" class="car-badge">O LENDÁRIO</span>
+                </div>
+                <p id="car-desc" class="car-description">
+                  Veloz, ágil e munido com a mística escada no teto. Ativa o Modo Firma (Nitro), mas exige cuidado nas crateras.
+                </p>
+                
+                <!-- Barras de Atributos -->
+                <div class="car-attributes">
+                  <div class="attr-row">
+                    <span>Velocidade Máxima:</span>
+                    <div class="attr-bar"><div id="attr-speed" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Tração no Barro:</span>
+                    <div class="attr-bar"><div id="attr-traction" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Resistência (HP):</span>
+                    <div class="attr-bar"><div id="attr-durability" class="attr-fill"></div></div>
+                  </div>
+                  <div class="attr-row">
+                    <span>Econ. Combustível:</span>
+                    <div class="attr-bar"><div id="attr-fuel" class="attr-fill"></div></div>
+                  </div>
+                </div>
+
+                <div class="car-special">
+                  <strong>Habilidade de Corrida:</strong> <span id="car-ability">Modo Firma (Super Aceleração temporária com ESPAÇO)</span>
+                </div>
+              </div>
+            </div>
+
+            <button id="btn-next-car" class="nav-arrow" aria-label="Próximo Veículo">❯</button>
+          </div>
+
+          <!-- Mini Guia de Controles -->
+          <div class="controls-guide">
+            <div class="guide-item">
+              <span class="key-pill">⬆️ / W</span> Acelerar
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">⬇️ / S</span> Ré / Freio
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">⬅️ ➡️ / A D</span> Direção / Ultrapassagem
+            </div>
+            <div class="guide-item">
+              <span class="key-pill">ESPAÇO</span> Buzina / Nitro
+            </div>
+          </div>
+
+          <div class="menu-actions">
+            <button id="btn-start" class="btn-primary">LARGAR NO RALLY! 🚦🏁</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE PAUSA -->
+      <div id="pause-screen" class="overlay-screen hidden">
+        <div class="modal-card">
+          <h2>CORRIDA PAUSADA</h2>
+          <p>Você encostou no acostamento da BR-230.</p>
+          <div class="modal-buttons">
+            <button id="btn-resume" class="btn-primary">CONTINUAR CORRIDA ▶️</button>
+            <button id="btn-quit" class="btn-secondary">VOLTAR À GARAGEM 🚪</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE GAME OVER / DERROTA -->
+      <div id="gameover-screen" class="overlay-screen hidden">
+        <div class="modal-card gameover-card">
+          <div class="modal-icon">⚠️</div>
+          <h2 id="gameover-title">FIM DE CORRIDA!</h2>
+          <p id="gameover-reason">Seu veículo quebrou devido às crateras da Transamazônica.</p>
+
+          <div class="final-stats-grid">
+            <div class="stat-box">
+              <span class="stat-num" id="stat-dist">0 km</span>
+              <span class="stat-label">Distância Percorrida</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="stat-seeds">0</span>
+              <span class="stat-label">Mudas Salvas</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="stat-fauna">0</span>
+              <span class="stat-label">Animais Respeitados</span>
+            </div>
+            <div class="stat-box highlight-box">
+              <span class="stat-num" id="stat-score">0</span>
+              <span class="stat-label">Pontuação Total</span>
+            </div>
+          </div>
+
+          <div class="record-badge">
+            🏆 Melhor Corrida: <span id="stat-record">0 pts</span>
+          </div>
+
+          <div class="modal-buttons">
+            <button id="btn-retry" class="btn-primary">CORRER NOVAMENTE 🔄</button>
+            <button id="btn-garage-return" class="btn-secondary">TROCAR CARRO 🚗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA DE VITÓRIA / PÓDIO DE CORRIDA -->
+      <div id="victory-screen" class="overlay-screen hidden">
+        <div class="modal-card victory-card">
+          <div class="modal-icon" id="vic-trophy">🏆</div>
+          <h2 id="vic-title">CHEGADA EM 1º LUGAR!</h2>
+          <p id="vic-subtitle">Você cruzou a linha de chegada na Base de Altamira como o Campeão da Transamazônica!</p>
+
+          <div class="podium-display">
+            <div class="podium-rank" id="vic-badge">🥇 CAMPEÃO DA BR-230</div>
+          </div>
+
+          <div class="final-stats-grid">
+            <div class="stat-box">
+              <span class="stat-num" id="vic-time">00:00</span>
+              <span class="stat-label">Tempo de Corrida</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="vic-seeds">0</span>
+              <span class="stat-label">Mudas Coletadas</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="vic-fauna">0</span>
+              <span class="stat-label">Fauna Preservada</span>
+            </div>
+            <div class="stat-box highlight-box">
+              <span class="stat-num" id="vic-score">0</span>
+              <span class="stat-label">Pontuação do Pódio</span>
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button id="btn-play-again" class="btn-primary">CORRER DE NOVO 🌟</button>
+            <button id="btn-vic-garage" class="btn-secondary">GARAGEM DE CARROS 🚗</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL DE INFORMAÇÕES E HISTÓRIA DO JOGO -->
+      <div id="info-modal" class="overlay-screen hidden">
+        <div class="modal-card info-card">
+          <h2>🌿 Sobre a Expedição Transamazônica</h2>
+          <div class="info-content">
+            <p><strong>A Rodovia BR-230 (Transamazônica)</strong> é uma das estradas mais emblemáticas do Brasil. Cortando a densa floresta tropical, ela conecta comunidades isoladas mas enfrenta desafios colossais: chuvas torrenciais, atoleiros de barro vermelho e travessias perigosas de pontes sobre igarapés.</p>
+            <p><strong>🌱 Objetivo Ecológico:</strong> Neste jogo, sua missão vai além da velocidade. Você transporta sementes e mudas nativas para reflorestamento e deve dirigir com consciência ambiental, respeitando os animais que cruzam a pista (antas, capivaras, jacarés e preguiças).</p>
+            <p><strong>🚜 Os Veículos Brasileiros:</strong> Escolha entre ícones automotivos como o clássico <em>Uno Mille com escada</em>, o valente <em>Fusca Baja 1974</em>, a robusta <em>Camionete D20 4x4</em>, o histórico <em>Jeep Willys</em> ou o imponente <em>Caminhão Mercedes-Benz 1113 Trucado</em>!</p>
+          </div>
+          <button id="btn-close-info" class="btn-primary">FECHAR ✖</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé Semântico -->
+    <footer class="game-footer">
+      <p>Desenvolvido para o <strong>Desafio Web Games • Missão Amazônia Criativa</strong> | HTML5 Canvas, CSS3 e JavaScript Puro.</p>
+    </footer>
+  </div>
+
+  <!-- Scripts do Jogo Modularizados -->
+  <script>
+/**
+ * SISTEMA DE ÁUDIO PROCEDURAL (Web Audio API)
+ * Gera efeitos sonoros em tempo real sem necessitar de arquivos externos de MP3/WAV.
+ */
+
+class SoundSystem {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+    this.engineOsc = null;
+    this.engineGain = null;
+    this.engineFilter = null;
+    this.isEngineRunning = false;
+    this.rainSource = null;
+    this.rainGain = null;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (!this.enabled) {
+      this.stopEngine();
+      this.stopRain();
+    }
+    return this.enabled;
+  }
+
+  // --- MOTOR PROCEDURAL CONTÍNUO ---
+  startEngine(vehicleType = 'uno') {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx || this.isEngineRunning) return;
+
+    try {
+      this.engineOsc = this.ctx.createOscillator();
+      this.engineGain = this.ctx.createGain();
+      this.engineFilter = this.ctx.createBiquadFilter();
+
+      // Configuração base dependendo do tipo de veículo
+      let baseFreq = 55;
+      let oscType = 'sawtooth';
+      
+      if (vehicleType === 'caminhao') {
+        baseFreq = 42; // Diesel grave de caminhão MB 1113
+        oscType = 'triangle';
+      } else if (vehicleType === 'fusca') {
+        baseFreq = 62; // Motor Boxer clássico
+        oscType = 'square';
+      } else if (vehicleType === 'jeep') {
+        baseFreq = 48; // Willys 4x4
+        oscType = 'sawtooth';
+      } else if (vehicleType === 'camionete') {
+        baseFreq = 50; // D20 Diesel
+        oscType = 'sawtooth';
+      }
+
+      this.engineOsc.type = oscType;
+      this.engineOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+
+      this.engineFilter.type = 'lowpass';
+      this.engineFilter.frequency.setValueAtTime(250, this.ctx.currentTime);
+
+      this.engineGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+
+      this.engineOsc.connect(this.engineFilter);
+      this.engineFilter.connect(this.engineGain);
+      this.engineGain.connect(this.ctx.destination);
+
+      this.engineOsc.start();
+      this.isEngineRunning = true;
+    } catch (e) {
+      console.warn("Áudio não pôde ser iniciado:", e);
+    }
+  }
+
+  updateEngine(speedRatio, isAccelerating, vehicleType) {
+    if (!this.enabled || !this.isEngineRunning || !this.ctx) return;
+    
+    let baseFreq = 50;
+    let maxFreq = 160;
+
+    if (vehicleType === 'caminhao') {
+      baseFreq = 38;
+      maxFreq = 110;
+    } else if (vehicleType === 'uno') {
+      baseFreq = 60;
+      maxFreq = 220; // Uno Mille giro alto
+    } else if (vehicleType === 'fusca') {
+      baseFreq = 55;
+      maxFreq = 140;
+    }
+
+    const targetFreq = baseFreq + (maxFreq - baseFreq) * speedRatio + (isAccelerating ? 15 : 0);
+    const targetGain = 0.03 + (isAccelerating ? 0.05 : 0.01) * (0.6 + speedRatio * 0.4);
+
+    const now = this.ctx.currentTime;
+    this.engineOsc.frequency.setTargetAtTime(targetFreq, now, 0.08);
+    this.engineGain.gain.setTargetAtTime(targetGain, now, 0.08);
+    this.engineFilter.frequency.setTargetAtTime(150 + speedRatio * 400, now, 0.08);
+  }
+
+  stopEngine() {
+    if (this.engineOsc) {
+      try {
+        this.engineOsc.stop();
+        this.engineOsc.disconnect();
+      } catch (e) {}
+      this.engineOsc = null;
+      this.isEngineRunning = false;
+    }
+  }
+
+  // --- BUZINAS TEMÁTICAS ---
+  playHorn(vehicleType = 'uno') {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    if (vehicleType === 'caminhao') {
+      // Buzina a Ar Dupla de Caminhão
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(185, now);
+      osc2.frequency.setValueAtTime(233, now);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.6);
+      osc2.stop(now + 0.6);
+    } else {
+      // Buzina Clássica
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'triangle';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(420, now);
+      osc2.frequency.setValueAtTime(460, now);
+
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.35);
+      osc2.stop(now + 0.35);
+    }
+  }
+
+  // --- SOM DE LAMA / DERRAPAGEM ---
+  playMudSplash() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const bufferSize = this.ctx.sampleRate * 0.25;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(320, this.ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.25);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    noise.start();
+  }
+
+  // --- SOM DE IMPACTO / BURACO ---
+  playImpact() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.2);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
+  // --- COLETAS ---
+  playSeedPickup() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(523.25, now); // C5
+    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  playFuelPickup() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(330, now);
+    osc.frequency.exponentialRampToValueAtTime(660, now + 0.25);
+
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  playPowerup() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.35);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+
+  // --- SEMÁFORO DE LARGADA ---
+  playCountdownBeep(isFinal = false) {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = isFinal ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(isFinal ? 880 : 440, now); // Agudo no "VAI!"
+
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + (isFinal ? 0.6 : 0.25));
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + (isFinal ? 0.6 : 0.25));
+  }
+
+  // --- VÁCUO / ULTRAPASSAGEM (SLIPSTREAM) ---
+  playSlipstream() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(450, now + 0.4);
+
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.4);
+  }
+
+  // --- IMPACTO ENTRE CARROS ---
+  playCarBump() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }
+  startRain() {
+    if (!this.enabled || this.rainSource || !this.ctx) return;
+    this.init();
+    try {
+      const bufferSize = this.ctx.sampleRate * 2;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      this.rainSource = this.ctx.createBufferSource();
+      this.rainSource.buffer = buffer;
+      this.rainSource.loop = true;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(800, this.ctx.currentTime);
+      filter.Q.setValueAtTime(1, this.ctx.currentTime);
+
+      this.rainGain = this.ctx.createGain();
+      this.rainGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+
+      this.rainSource.connect(filter);
+      filter.connect(this.rainGain);
+      this.rainGain.connect(this.ctx.destination);
+
+      this.rainSource.start();
+    } catch (e) {}
+  }
+
+  stopRain() {
+    if (this.rainSource) {
+      try {
+        this.rainSource.stop();
+        this.rainSource.disconnect();
+      } catch (e) {}
+      this.rainSource = null;
+    }
+  }
+
+  playThunder() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const bufferSize = this.ctx.sampleRate * 1.5;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.4));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(120, this.ctx.currentTime);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.4);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    noise.start();
+  }
+
+  // --- GAME OVER & VITÓRIA ---
+  playGameOver() {
+    if (!this.enabled) return;
+    this.stopEngine();
+    this.stopRain();
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.setValueAtTime(220, now + 0.15);
+    osc.frequency.setValueAtTime(174.6, now + 0.35);
+    osc.frequency.setValueAtTime(130.8, now + 0.6);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.9);
+  }
+
+  playVictory() {
+    if (!this.enabled) return;
+    this.stopEngine();
+    this.stopRain();
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99]; // Acorde C Major
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+      gain.gain.setValueAtTime(0.08, now + idx * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.6);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + idx * 0.1);
+      osc.stop(now + idx * 0.1 + 0.6);
+    });
+  }
+}
+
+// Instância global
+window.gameAudio = new SoundSystem();
+
+/**
+ * DEFINIÇÃO DOS VEÍCULOS BRASILEIROS DA TRANSAMAZÔNICA
+ * Contém atributos de física, renderização procedural do sprite em 2D Top-Down e Garage Preview.
+ */
+
+const VEHICLES = {
+  uno: {
+    id: 'uno',
+    name: 'Uno Mille com Escada',
+    tag: 'O LENDÁRIO DA FIRMA',
+    desc: 'O mito das estradas brasileiras. Rápido, leve e munido com a clássica escada aerodinâmica no teto. Ativa o "Modo Firma" (Nitro).',
+    ability: 'Modo Firma: Super Nitro com a tecla ESPAÇO / Toque!',
+    width: 36,
+    height: 64,
+    maxSpeed: 135,
+    accel: 0.28,
+    brake: 0.35,
+    handling: 3.6,
+    mudTraction: 0.52, // Sofre na lama
+    durability: 100,
+    fuelEfficiency: 0.85,
+    color: '#f5f6fa',
+    accentColor: '#e74c3c',
+    draw: function(ctx, x, y, width, height, isBraking, isBoosting) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Sombra
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 3, -height/2 + 3, width, height, 6);
+      ctx.fill();
+
+      // Carroceria Branca Uno
+      ctx.fillStyle = isBoosting ? '#fff07c' : '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(-width/2, -height/2, width, height, 4);
+      ctx.fill();
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Para-brisa e Vidros
+      ctx.fillStyle = '#2c3e50';
+      // Dianteiro
+      ctx.fillRect(-width/2 + 4, -height/2 + 14, width - 8, 10);
+      // Traseiro
+      ctx.fillRect(-width/2 + 4, height/2 - 14, width - 8, 8);
+      // Laterais
+      ctx.fillRect(-width/2 + 2, -height/2 + 26, 3, 20);
+      ctx.fillRect(width/2 - 5, -height/2 + 26, 3, 20);
+
+      // Teto do Uno
+      ctx.fillStyle = '#ecf0f1';
+      ctx.fillRect(-width/2 + 5, -height/2 + 24, width - 10, 24);
+
+      // A LENDÁRIA ESCADA NO TETO
+      ctx.strokeStyle = '#7f8c8d';
+      ctx.lineWidth = 2.5;
+      // Trilhos da escada
+      ctx.beginPath();
+      ctx.moveTo(-width/2 + 9, -height/2 + 8);
+      ctx.lineTo(-width/2 + 9, height/2 - 6);
+      ctx.moveTo(width/2 - 9, -height/2 + 8);
+      ctx.lineTo(width/2 - 9, height/2 - 6);
+      // Degraus
+      for (let step = -height/2 + 14; step <= height/2 - 10; step += 8) {
+        ctx.moveTo(-width/2 + 9, step);
+        ctx.lineTo(width/2 - 9, step);
+      }
+      ctx.stroke();
+
+      // Faixa da Firma na Lateral / Capô
+      ctx.fillStyle = '#3498db';
+      ctx.fillRect(-width/2 + 8, -height/2 + 4, width - 16, 4);
+
+      // Faróis Dianteiros
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(-width/2 + 3, -height/2 + 1, 7, 3);
+      ctx.fillRect(width/2 - 10, -height/2 + 1, 7, 3);
+
+      // Lanternas Traseiras
+      ctx.fillStyle = isBraking ? '#ff0000' : '#c0392b';
+      if (isBraking) {
+        ctx.shadowColor = '#ff0000';
+        ctx.shadowBlur = 8;
+      }
+      ctx.fillRect(-width/2 + 2, height/2 - 3, 6, 3);
+      ctx.fillRect(width/2 - 8, height/2 - 3, 6, 3);
+
+      // Chamas no Nitro
+      if (isBoosting) {
+        ctx.fillStyle = '#ff3838';
+        ctx.beginPath();
+        ctx.moveTo(-6, height/2 + 2);
+        ctx.lineTo(0, height/2 + 16 + Math.random() * 8);
+        ctx.lineTo(6, height/2 + 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  },
+
+  fusca: {
+    id: 'fusca',
+    name: 'Fusca 1974 Baja Reformado',
+    tag: 'O VALENTE DA TERRA',
+    desc: 'Motor boxer refrigerado a ar sobre o eixo de tração traseiro. Excelente tração em barro e alta tolerância a solavancos.',
+    ability: 'Suspensão Baja: 50% de resistência extra contra buracos e erosões.',
+    width: 38,
+    height: 62,
+    maxSpeed: 105,
+    accel: 0.22,
+    brake: 0.32,
+    handling: 3.8,
+    mudTraction: 0.82, // Ótima tração
+    durability: 135,
+    fuelEfficiency: 0.95,
+    color: '#e67e22',
+    accentColor: '#2c3e50',
+    draw: function(ctx, x, y, width, height, isBraking, isBoosting) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Sombra
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.beginPath();
+      ctx.ellipse(2, 3, width/2 + 1, height/2 + 1, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Paralamas Arredondados do Fusca Baja
+      ctx.fillStyle = '#2c3e50';
+      // Dianteiros
+      ctx.fillRect(-width/2 - 1, -height/2 + 10, 6, 16);
+      ctx.fillRect(width/2 - 5, -height/2 + 10, 6, 16);
+      // Traseiros
+      ctx.fillRect(-width/2 - 2, height/2 - 26, 7, 18);
+      ctx.fillRect(width/2 - 5, height/2 - 26, 7, 18);
+
+      // Carroceria Curvada Laranja / Amarelo Ocre
+      ctx.fillStyle = '#e67e22';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, width/2 - 2, height/2 - 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#9e2a0b';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Vidros arredondados
+      ctx.fillStyle = '#1e272e';
+      // Dianteiro
+      ctx.beginPath();
+      ctx.ellipse(0, -height/2 + 16, width/2 - 7, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Traseiro
+      ctx.beginPath();
+      ctx.ellipse(0, height/2 - 16, width/2 - 8, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Teto Solar / Ragtop
+      ctx.fillStyle = '#d35400';
+      ctx.fillRect(-width/2 + 9, -height/2 + 22, width - 18, 18);
+
+      // Grade do Motor Traseiro (Boxer)
+      ctx.fillStyle = '#2c3e50';
+      for (let i = height/2 - 8; i <= height/2 - 2; i += 3) {
+        ctx.fillRect(-6, i, 12, 1.5);
+      }
+
+      // Quebra-Mato Dianteiro Tubular
+      ctx.strokeStyle = '#7f8c8d';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-width/2 + 6, -height/2 + 3);
+      ctx.lineTo(width/2 - 6, -height/2 + 3);
+      ctx.stroke();
+
+      // Faróis redondos
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(-width/2 + 8, -height/2 + 6, 3.5, 0, Math.PI * 2);
+      ctx.arc(width/2 - 8, -height/2 + 6, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lanternas
+      ctx.fillStyle = isBraking ? '#ff0000' : '#c0392b';
+      ctx.fillRect(-width/2 + 5, height/2 - 4, 4, 3);
+      ctx.fillRect(width/2 - 9, height/2 - 4, 4, 3);
+
+      ctx.restore();
+    }
+  },
+
+  camionete: {
+    id: 'camionete',
+    name: 'Camionete D20 / Hilux Raiz',
+    tag: 'FORÇA BRUTA 4X4',
+    desc: 'Robusta, espaçosa e com caçamba reforçada. Tanque grande e tração bruta nas quatro rodas para enfrentar qualquer trecho.',
+    ability: 'Força Bruta: Alta resistência e pneus off-road para lamaçal denso.',
+    width: 42,
+    height: 74,
+    maxSpeed: 120,
+    accel: 0.25,
+    brake: 0.30,
+    handling: 3.2,
+    mudTraction: 0.88,
+    durability: 160,
+    fuelEfficiency: 0.75,
+    color: '#2980b9',
+    accentColor: '#bdc3c7',
+    draw: function(ctx, x, y, width, height, isBraking, isBoosting) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Sombra
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 3, -height/2 + 3, width, height, 6);
+      ctx.fill();
+
+      // Pneus Lameiros Saltados
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-width/2 - 2, -height/2 + 10, 5, 16);
+      ctx.fillRect(width/2 - 3, -height/2 + 10, 5, 16);
+      ctx.fillRect(-width/2 - 2, height/2 - 24, 5, 16);
+      ctx.fillRect(width/2 - 3, height/2 - 24, 5, 16);
+
+      // Carroceria Cabine Dupla Azul Petróleo
+      ctx.fillStyle = '#2471a3';
+      ctx.beginPath();
+      ctx.roundRect(-width/2, -height/2, width, height, 5);
+      ctx.fill();
+      ctx.strokeStyle = '#1b4f72';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Capô e Santo Antônio
+      ctx.fillStyle = '#1f618d';
+      ctx.fillRect(-width/2 + 4, -height/2 + 4, width - 8, 18);
+
+      // Para-brisa
+      ctx.fillStyle = '#1c2833';
+      ctx.fillRect(-width/2 + 5, -height/2 + 20, width - 10, 10);
+
+      // Teto da Cabine
+      ctx.fillStyle = '#2980b9';
+      ctx.fillRect(-width/2 + 4, -height/2 + 28, width - 8, 16);
+
+      // Caçamba com Carga / Mudas
+      ctx.fillStyle = '#1a3628';
+      ctx.fillRect(-width/2 + 4, height/2 - 26, width - 8, 22);
+      ctx.strokeStyle = '#2c3e50';
+      ctx.strokeRect(-width/2 + 4, height/2 - 26, width - 8, 22);
+
+      // Mudas verdes na caçamba
+      ctx.fillStyle = '#2ecc71';
+      ctx.beginPath();
+      ctx.arc(-6, height/2 - 15, 4, 0, Math.PI * 2);
+      ctx.arc(4, height/2 - 17, 5, 0, Math.PI * 2);
+      ctx.arc(-1, height/2 - 8, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Santo Antônio Cromado
+      ctx.strokeStyle = '#bdc3c7';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(-width/2 + 6, height/2 - 28, width - 12, 4);
+
+      // Faróis
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(-width/2 + 3, -height/2 + 1, 9, 3);
+      ctx.fillRect(width/2 - 12, -height/2 + 1, 9, 3);
+
+      // Lanternas
+      ctx.fillStyle = isBraking ? '#ff0000' : '#c0392b';
+      ctx.fillRect(-width/2 + 3, height/2 - 3, 7, 3);
+      ctx.fillRect(width/2 - 10, height/2 - 3, 7, 3);
+
+      ctx.restore();
+    }
+  },
+
+  jeep: {
+    id: 'jeep',
+    name: 'Jeep Willys 1960 4x4',
+    tag: 'O REI DA LAMA',
+    desc: 'O veterano indomável da Amazônia. Tração 4x4 com marcha reduzida que atravessa qualquer atoleiro sem perder o controle.',
+    ability: 'Imunidade ao Barro: Redução de velocidade quase nula nos atoleiros densos.',
+    width: 40,
+    height: 60,
+    maxSpeed: 92,
+    accel: 0.24,
+    brake: 0.36,
+    handling: 4.0,
+    mudTraction: 0.96, // Quase imune à lama
+    durability: 170,
+    fuelEfficiency: 0.80,
+    color: '#27ae60',
+    accentColor: '#d35400',
+    draw: function(ctx, x, y, width, height, isBraking, isBoosting) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Sombra
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 2, -height/2 + 3, width, height, 4);
+      ctx.fill();
+
+      // Pneus largos Off-Road
+      ctx.fillStyle = '#111';
+      ctx.fillRect(-width/2 - 3, -height/2 + 6, 6, 15);
+      ctx.fillRect(width/2 - 3, -height/2 + 6, 6, 15);
+      ctx.fillRect(-width/2 - 3, height/2 - 20, 6, 15);
+      ctx.fillRect(width/2 - 3, height/2 - 20, 6, 15);
+
+      // Carroceria Verde Militar
+      ctx.fillStyle = '#1e8449';
+      ctx.beginPath();
+      ctx.roundRect(-width/2, -height/2, width, height, 3);
+      ctx.fill();
+      ctx.strokeStyle = '#145a32';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Capô Clássico Estreito Willys
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(-width/2 + 7, -height/2 + 2, width - 14, 18);
+
+      // Grade com fendas verticais
+      ctx.fillStyle = '#145a32';
+      for (let gx = -width/2 + 10; gx <= width/2 - 12; gx += 4) {
+        ctx.fillRect(gx, -height/2 + 2, 2, 4);
+      }
+
+      // Para-brisa Dobrável
+      ctx.fillStyle = '#2c3e50';
+      ctx.fillRect(-width/2 + 5, -height/2 + 20, width - 10, 5);
+
+      // Habitáculo Aberto com Santo Antônio / Gaiola
+      ctx.fillStyle = '#145a32';
+      ctx.fillRect(-width/2 + 5, -height/2 + 26, width - 10, 22);
+
+      // Bancos e Volante
+      ctx.fillStyle = '#78281f';
+      ctx.fillRect(-width/2 + 8, -height/2 + 30, 9, 8);
+      ctx.fillRect(width/2 - 17, -height/2 + 30, 9, 8);
+
+      // Gaiola Tubular
+      ctx.strokeStyle = '#111';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-width/2 + 6, -height/2 + 27, width - 12, 20);
+
+      // Estepe Traseiro
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.ellipse(0, height/2 - 1, 8, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Faróis redondos
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(-width/2 + 6, -height/2 + 4, 3, 0, Math.PI * 2);
+      ctx.arc(width/2 - 6, -height/2 + 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lanternas
+      ctx.fillStyle = isBraking ? '#ff0000' : '#c0392b';
+      ctx.fillRect(-width/2 + 2, height/2 - 3, 4, 3);
+      ctx.fillRect(width/2 - 6, height/2 - 3, 4, 3);
+
+      ctx.restore();
+    }
+  },
+
+  caminhao: {
+    id: 'caminhao',
+    name: 'Caminhão MB 1113 Trucado',
+    tag: 'O GIGANTE DA ESTRADA',
+    desc: 'O lendário caminhão Mercedes-Benz que abriu a Transamazônica. Chassi super resistente, rodagem dupla e buzina a ar potente.',
+    ability: 'Casco Pesado & Buzina a Ar: Destrói pequenos obstáculos e afasta animais a longa distância.',
+    width: 48,
+    height: 94,
+    maxSpeed: 102,
+    accel: 0.18,
+    brake: 0.28,
+    handling: 2.7,
+    mudTraction: 0.85,
+    durability: 230, // Gigante
+    fuelEfficiency: 0.70,
+    color: '#c0392b',
+    accentColor: '#f39c12',
+    draw: function(ctx, x, y, width, height, isBraking, isBoosting) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      // Sombra alongada
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 4, -height/2 + 4, width, height, 6);
+      ctx.fill();
+
+      // Rodagem Dupla Traseira (Trucado) e Dianteira
+      ctx.fillStyle = '#111';
+      // Dianteiras
+      ctx.fillRect(-width/2 - 3, -height/2 + 14, 5, 18);
+      ctx.fillRect(width/2 - 2, -height/2 + 14, 5, 18);
+      // Trucado 1
+      ctx.fillRect(-width/2 - 4, height/2 - 40, 6, 16);
+      ctx.fillRect(width/2 - 2, height/2 - 40, 6, 16);
+      // Trucado 2
+      ctx.fillRect(-width/2 - 4, height/2 - 20, 6, 16);
+      ctx.fillRect(width/2 - 2, height/2 - 20, 6, 16);
+
+      // Carroceria / Madeira da Caçamba (Traseira)
+      ctx.fillStyle = '#8e44ad';
+      // Madeira marrom / azul clássico
+      ctx.fillStyle = '#5c3a21';
+      ctx.fillRect(-width/2 + 2, -height/2 + 36, width - 4, height - 40);
+      ctx.strokeStyle = '#3e2713';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-width/2 + 2, -height/2 + 36, width - 4, height - 40);
+
+      // Réguas de madeira da carroceria
+      ctx.strokeStyle = '#8d5524';
+      ctx.lineWidth = 1;
+      for (let ypos = -height/2 + 44; ypos < height/2 - 6; ypos += 8) {
+        ctx.beginPath();
+        ctx.moveTo(-width/2 + 4, ypos);
+        ctx.lineTo(width/2 - 4, ypos);
+        ctx.stroke();
+      }
+
+      // Carga de Sacarias / Mudas Amazônicas
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(-width/2 + 8, -height/2 + 42, width - 16, 20);
+      ctx.fillStyle = '#2ecc71';
+      ctx.fillRect(-width/2 + 10, height/2 - 30, width - 20, 18);
+
+      // Cabine Clássica Bicuda MB 1113 Vermelha / Azul
+      ctx.fillStyle = '#c0392b';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 3, -height/2, width - 6, 38, 6);
+      ctx.fill();
+      ctx.strokeStyle = '#962d22';
+      ctx.stroke();
+
+      // Capô dianteiro arredondado com Estrela MB
+      ctx.fillStyle = '#a93226';
+      ctx.beginPath();
+      ctx.roundRect(-width/2 + 10, -height/2, width - 20, 16, 4);
+      ctx.fill();
+
+      // Friso cromado do capô
+      ctx.fillStyle = '#f1c40f';
+      ctx.fillRect(-2, -height/2 + 2, 4, 12);
+
+      // Para-brisa bipartido
+      ctx.fillStyle = '#1c2833';
+      ctx.fillRect(-width/2 + 7, -height/2 + 16, (width - 16) / 2 - 1, 8);
+      ctx.fillRect(1, -height/2 + 16, (width - 16) / 2 - 1, 8);
+
+      // Teto da Cabine com Buzinas Marítimas
+      ctx.fillStyle = '#e74c3c';
+      ctx.fillRect(-width/2 + 6, -height/2 + 24, width - 12, 10);
+
+      // Buzinas a Ar no Teto
+      ctx.fillStyle = '#f39c12';
+      ctx.fillRect(-10, -height/2 + 26, 4, 7);
+      ctx.fillRect(6, -height/2 + 26, 4, 7);
+
+      // Quebra-Sol Verde
+      ctx.fillStyle = '#27ae60';
+      ctx.fillRect(-width/2 + 6, -height/2 + 14, width - 12, 2);
+
+      // Faróis redondos potentes
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(-width/2 + 8, -height/2 + 3, 4, 0, Math.PI * 2);
+      ctx.arc(width/2 - 8, -height/2 + 3, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Lanternas
+      ctx.fillStyle = isBraking ? '#ff0000' : '#c0392b';
+      ctx.fillRect(-width/2 + 4, height/2 - 4, 8, 3);
+      ctx.fillRect(width/2 - 12, height/2 - 4, 8, 3);
+
+      ctx.restore();
+    }
+  }
+};
+
+window.VEHICLES = VEHICLES;
+
+/**
+ * GERENCIADOR DE OBSTÁCULOS, FAUNA AMAZÔNICA E COLETÁVEIS
+ * Responsável pela lógica de geração procedural, atualização e desenho no Canvas.
+ */
+
+class ObstacleManager {
+  constructor(roadWidth) {
+    this.roadWidth = roadWidth;
+    this.hazards = [];     // Lamaçais, buracos, troncos, pontes
+    this.wildlife = [];    // Capivaras, antas, jacarés, preguiças
+    this.collectibles = [];// Mudas, combustíveis, reparos, pranchas
+    this.particles = [];   // Spray de lama, folhas, faíscas
+    this.spawnTimer = 0;
+    this.totalDistance = 0;
+  }
+
+  reset() {
+    this.hazards = [];
+    this.wildlife = [];
+    this.collectibles = [];
+    this.particles = [];
+    this.spawnTimer = 0;
+    this.totalDistance = 0;
+  }
+
+  update(speed, delta, roadCurvature, isBridgeZone, weather) {
+    const moveDist = speed * delta * 15;
+    this.totalDistance += moveDist;
+
+    // Atualiza e remove perigos
+    for (let i = this.hazards.length - 1; i >= 0; i--) {
+      const h = this.hazards[i];
+      h.y += moveDist;
+      if (h.y > 700) {
+        this.hazards.splice(i, 1);
+      }
+    }
+
+    // Atualiza e remove animais
+    for (let i = this.wildlife.length - 1; i >= 0; i--) {
+      const w = this.wildlife[i];
+      w.y += moveDist;
+      
+      // Movimento do animal atravessando a pista
+      w.x += w.vx * (w.alerted ? 2.5 : 1) * delta * 60;
+      w.animTimer = (w.animTimer || 0) + delta * 8;
+
+      // Saiu da tela
+      if (w.y > 700 || w.x < -100 || w.x > 900) {
+        this.wildlife.splice(i, 1);
+      }
+    }
+
+    // Atualiza e remove coletáveis
+    for (let i = this.collectibles.length - 1; i >= 0; i--) {
+      const c = this.collectibles[i];
+      c.y += moveDist;
+      c.pulse = (c.pulse || 0) + delta * 5;
+      if (c.y > 700) {
+        this.collectibles.splice(i, 1);
+      }
+    }
+
+    // Atualiza partículas de lama/efeitos
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx * delta * 60;
+      p.y += (p.vy + moveDist * 0.5) * delta * 60;
+      p.life -= delta * 2;
+      p.size = Math.max(0, p.size - delta * 4);
+      if (p.life <= 0 || p.size <= 0) {
+        this.particles.splice(i, 1);
+      }
+    }
+
+    // Spawn Procedural baseado na distância
+    this.spawnTimer += delta;
+    if (this.spawnTimer > 1.2) {
+      this.spawnTimer = 0;
+      this.spawnWave(isBridgeZone, weather);
+    }
+  }
+
+  spawnWave(isBridgeZone, weather) {
+    const roadLeft = 200;
+    const roadRight = 600;
+    const roadCenter = 400;
+
+    // Se estiver em ponte estreita de igarapé
+    if (isBridgeZone) {
+      if (Math.random() < 0.4) {
+        // Tábua solta ou buraco na ponte
+        this.hazards.push({
+          type: 'bridge_hole',
+          x: roadCenter + (Math.random() * 120 - 60),
+          y: -80,
+          width: 45,
+          height: 35
+        });
+      }
+      if (Math.random() < 0.5) {
+        // Muda ecológica na ponte
+        this.collectibles.push({
+          type: 'seed',
+          x: roadCenter + (Math.random() * 100 - 50),
+          y: -100,
+          radius: 14
+        });
+      }
+      return;
+    }
+
+    // Spawn de Terreno (Atoleiro de barro ou Buraco)
+    const hazardChance = weather === 'rain' ? 0.85 : 0.65;
+    if (Math.random() < hazardChance) {
+      const rand = Math.random();
+      const hX = roadLeft + 40 + Math.random() * (roadRight - roadLeft - 80);
+
+      if (rand < 0.55) {
+        // Atoleiro de Barro Vermelho
+        this.hazards.push({
+          type: 'mud',
+          x: hX,
+          y: -120,
+          width: 90 + Math.random() * 60,
+          height: 80 + Math.random() * 50,
+          viscosity: 0.6 + Math.random() * 0.3
+        });
+      } else if (rand < 0.85) {
+        // Cratera / Buraco de Chuva
+        this.hazards.push({
+          type: 'pothole',
+          x: hX,
+          y: -80,
+          width: 48,
+          height: 38,
+          damage: 18
+        });
+      } else {
+        // Tronco Caído
+        this.hazards.push({
+          type: 'log',
+          x: hX,
+          y: -80,
+          width: 100,
+          height: 28,
+          damage: 30
+        });
+      }
+    }
+
+    // Spawn de Fauna Amazônica
+    if (Math.random() < 0.40) {
+      const speciesList = ['capivara', 'anta', 'jacare', 'preguica'];
+      const chosen = speciesList[Math.floor(Math.random() * speciesList.length)];
+      const fromLeft = Math.random() < 0.5;
+      
+      let speed = 0.8;
+      if (chosen === 'capivara') speed = 1.2;
+      else if (chosen === 'anta') speed = 1.6;
+      else if (chosen === 'preguica') speed = 0.3;
+      else if (chosen === 'jacare') speed = 0.6;
+
+      this.wildlife.push({
+        type: chosen,
+        x: fromLeft ? 160 : 640,
+        y: -90,
+        width: chosen === 'preguica' ? 26 : 38,
+        height: chosen === 'anta' ? 48 : 34,
+        vx: fromLeft ? speed : -speed,
+        alerted: false,
+        respected: false,
+        animTimer: 0
+      });
+    }
+
+    // Spawn de Coletáveis (Mudas, Combustível, Reparos, Pranchas)
+    if (Math.random() < 0.65) {
+      const cX = roadLeft + 30 + Math.random() * (roadRight - roadLeft - 60);
+      const randC = Math.random();
+      let type = 'seed';
+
+      if (randC < 0.55) type = 'seed';       // Muda de castanheira (+pontos)
+      else if (randC < 0.80) type = 'fuel';   // Galão de bio-combustível
+      else if (randC < 0.92) type = 'repair'; // Caixa de ferramentas
+      else type = 'plank';                    // Pranchas de desatolamento
+
+      this.collectibles.push({
+        type: type,
+        x: cX,
+        y: -100,
+        radius: 16
+      });
+    }
+  }
+
+  // Alerta animais próximos com a buzina
+  hornAlert(playerX, playerY, range = 350) {
+    let alertedCount = 0;
+    for (const w of this.wildlife) {
+      const dist = Math.hypot(w.x - playerX, w.y - playerY);
+      if (dist < range && !w.alerted) {
+        w.alerted = true;
+        w.vx *= 2.2; // Animal se assusta e corre para a margem da floresta
+        alertedCount++;
+      }
+    }
+    return alertedCount;
+  }
+
+  addMudParticles(x, y, count = 4) {
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: x + (Math.random() * 20 - 10),
+        y: y + (Math.random() * 10 - 5),
+        vx: (Math.random() - 0.5) * 4,
+        vy: 2 + Math.random() * 3,
+        size: 3 + Math.random() * 4,
+        color: Math.random() < 0.5 ? '#78281f' : '#9e2a0b',
+        life: 1.0
+      });
+    }
+  }
+
+  // ==========================================
+  // RENDERIZAÇÃO DOS OBJETOS NO CANVAS
+  // ==========================================
+  draw(ctx) {
+    // 1. Desenhar Lamaçais e Buracos (Camada inferior)
+    for (const h of this.hazards) {
+      if (h.type === 'mud') {
+        ctx.save();
+        ctx.fillStyle = '#6e1d08';
+        ctx.beginPath();
+        ctx.ellipse(h.x, h.y, h.width / 2, h.height / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Camada interna mais escura e pegajosa
+        ctx.fillStyle = '#4a1103';
+        ctx.beginPath();
+        ctx.ellipse(h.x, h.y, h.width / 2.8, h.height / 2.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rastros de pneu no barro
+        ctx.strokeStyle = '#2d0800';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(h.x - h.width/4, h.y - h.height/2.5);
+        ctx.lineTo(h.x - h.width/4, h.y + h.height/2.5);
+        ctx.moveTo(h.x + h.width/4, h.y - h.height/2.5);
+        ctx.lineTo(h.x + h.width/4, h.y + h.height/2.5);
+        ctx.stroke();
+
+        ctx.restore();
+      } else if (h.type === 'pothole' || h.type === 'bridge_hole') {
+        ctx.save();
+        ctx.fillStyle = '#1a0c08';
+        ctx.beginPath();
+        ctx.ellipse(h.x, h.y, h.width / 2, h.height / 2, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#d35400';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      } else if (h.type === 'log') {
+        ctx.save();
+        // Tronco de madeira caído
+        ctx.fillStyle = '#4e342e';
+        ctx.beginPath();
+        ctx.roundRect(h.x - h.width/2, h.y - h.height/2, h.width, h.height, 6);
+        ctx.fill();
+        ctx.strokeStyle = '#271a17';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Musgo amazônico no tronco
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(h.x - h.width/3, h.y - h.height/2, h.width/2, 4);
+        ctx.restore();
+      }
+    }
+
+    // 2. Desenhar Partículas de Barro
+    for (const p of this.particles) {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 3. Desenhar Fauna Amazônica
+    for (const w of this.wildlife) {
+      ctx.save();
+      ctx.translate(w.x, w.y);
+      if (w.vx < 0) ctx.scale(-1, 1);
+
+      if (w.type === 'capivara') {
+        // Capivara fofa
+        ctx.fillStyle = '#8d5524';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Focinho quadrado
+        ctx.fillRect(10, -6, 9, 10);
+        // Orelhinha
+        ctx.fillStyle = '#5c3818';
+        ctx.beginPath();
+        ctx.arc(6, -8, 3, 0, Math.PI * 2);
+        ctx.fill();
+        // Olhinho
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(12, -4, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (w.type === 'anta') {
+        // Anta Brasileira (Tapir)
+        ctx.fillStyle = '#4a4a4a';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 20, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Cabeça com tromba característica
+        ctx.fillRect(12, -7, 12, 11);
+        ctx.beginPath();
+        ctx.moveTo(24, -3);
+        ctx.lineTo(28, 2);
+        ctx.lineTo(22, 4);
+        ctx.fill();
+        // Olho
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(16, -4, 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (w.type === 'jacare') {
+        // Jacaré-Açu
+        ctx.fillStyle = '#1e3f20';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 22, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Focinho longo
+        ctx.fillRect(10, -4, 16, 8);
+        // Cauda
+        ctx.beginPath();
+        ctx.moveTo(-18, -4);
+        ctx.lineTo(-30, 0);
+        ctx.lineTo(-18, 4);
+        ctx.fill();
+        // Olhos amarelos
+        ctx.fillStyle = '#f1c40f';
+        ctx.beginPath();
+        ctx.arc(8, -6, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (w.type === 'preguica') {
+        // Bicho-Preguiça
+        ctx.fillStyle = '#a0855b';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 13, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Máscara facial clássica
+        ctx.fillStyle = '#f5f6fa';
+        ctx.beginPath();
+        ctx.arc(8, 0, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(6, -2, 4, 2); // Faixa dos olhos
+      }
+
+      // Se o animal estiver em alerta pela buzina
+      if (w.alerted) {
+        ctx.fillStyle = '#f1c40f';
+        ctx.font = 'bold 12px Montserrat';
+        ctx.fillText('!', 0, -16);
+      }
+
+      ctx.restore();
+    }
+
+    // 4. Desenhar Coletáveis
+    for (const c of this.collectibles) {
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      const scale = 1 + Math.sin(c.pulse) * 0.1;
+      ctx.scale(scale, scale);
+
+      // Brilho de fundo
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.arc(0, 0, c.radius + 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (c.type === 'seed') {
+        // Muda Ecológica / Semente de Castanheira
+        ctx.fillStyle = '#2ecc71';
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px Chakra Petch';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌱', 0, 0);
+      } else if (c.type === 'fuel') {
+        // Galão de Bio-Combustível
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.roundRect(-10, -12, 20, 24, 4);
+        ctx.fill();
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(-6, -16, 12, 4); // Alça
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⛽', 0, 0);
+      } else if (c.type === 'repair') {
+        // Kit de Ferramentas
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.roundRect(-12, -10, 24, 20, 4);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔧', 0, 0);
+      } else if (c.type === 'plank') {
+        // Pranchas de Desatolamento (Anti-lama)
+        ctx.fillStyle = '#d35400';
+        ctx.beginPath();
+        ctx.roundRect(-12, -12, 24, 24, 4);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Montserrat';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🪵', 0, 0);
+      }
+
+      ctx.restore();
+    }
+  }
+}
+
+window.ObstacleManager = ObstacleManager;
+
+/**
+ * MOTOR PRINCIPAL DE CORRIDA: RALLY TRANSAMAZÔNICA (BR-230)
+ * Controla o Game Loop de Corrida, IA dos 4 Rivais, Grid de Largada com Semáforo,
+ * Sistema de Vácuo (Slipstream), Posições em Tempo Real, Colisões e Pódio.
+ */
+
+class GameEngine {
+  constructor() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.previewCanvas = document.getElementById('vehiclePreviewCanvas');
+    this.previewCtx = this.previewCanvas.getContext('2d');
+
+    // Dimensões do Canvas
+    this.width = 800;
+    this.height = 600;
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+
+    // Estados do Jogo
+    this.STATE = { MENU: 0, COUNTDOWN: 1, PLAYING: 2, PAUSED: 3, GAMEOVER: 4, VICTORY: 5 };
+    this.currentState = this.STATE.MENU;
+
+    // Gerenciador de Obstáculos
+    this.obstacleManager = new ObstacleManager(400);
+
+    // Lista de Veículos
+    this.vehicleKeys = Object.keys(window.VEHICLES);
+    this.selectedCarIndex = 0;
+    this.currentCarData = window.VEHICLES[this.vehicleKeys[this.selectedCarIndex]];
+
+    // Jogador
+    this.player = {
+      x: 350,
+      y: 480,
+      vx: 0,
+      speed: 0,
+      targetSpeed: 0,
+      health: 100,
+      maxHealth: 100,
+      fuel: 100,
+      distanceKm: 0,
+      isBraking: false,
+      isBoosting: false,
+      boostTimer: 0,
+      plankTimer: 0,
+      isInMud: false,
+      inBridgeZone: false,
+      slipstream: false
+    };
+
+    // Adversários IA na Corrida
+    this.opponents = [];
+
+    // Estatísticas da Corrida
+    this.raceConfig = {
+      targetDistanceKm: 6.0, // 6 km de Rally Intenso
+      raceTime: 0,
+      currentRank: 5,
+      prevRank: 5
+    };
+
+    this.stats = {
+      seedsCollected: 0,
+      faunaRespected: 0,
+      score: 0,
+      highScore: parseInt(localStorage.getItem('transamazonica_highscore') || '0', 10)
+    };
+
+    // Semáforo de Largada
+    this.countdownTimer = 3.5;
+
+    // Clima Dinâmico (sun, rain, fog)
+    this.weather = 'sun';
+    this.weatherTimer = 0;
+    this.lightningTimer = 0;
+
+    // Pista e Cenário
+    this.roadScrollY = 0;
+    this.roadCurvature = 0;
+    this.targetCurvature = 0;
+    this.trees = [];
+    this.initTrees();
+
+    // Partículas de poeira e corrida
+    this.dustParticles = [];
+
+    // Controle de Teclas e Toque
+    this.keys = {};
+    this.touchInputs = { left: false, right: false, gas: false, brake: false };
+
+    // Timing
+    this.lastTime = performance.now();
+    this.cameraShake = 0;
+
+    // Inicialização
+    this.initDOM();
+    this.initInputs();
+    this.updateGarageUI();
+    this.renderGaragePreview();
+
+    // Iniciar Loop
+    requestAnimationFrame((t) => this.gameLoop(t));
+  }
+
+  initTrees() {
+    this.trees = [];
+    for (let i = 0; i < 28; i++) {
+      const isLeft = Math.random() < 0.5;
+      this.trees.push({
+        x: isLeft ? 30 + Math.random() * 130 : 640 + Math.random() * 130,
+        y: Math.random() * this.height,
+        size: 28 + Math.random() * 24,
+        type: Math.random() < 0.6 ? 'castanheira' : 'palmeira',
+        color: Math.random() < 0.5 ? '#1b4d3e' : '#143d2b'
+      });
+    }
+  }
+
+  initDOM() {
+    this.dom = {
+      hud: document.getElementById('game-hud'),
+      menuScreen: document.getElementById('menu-screen'),
+      pauseScreen: document.getElementById('pause-screen'),
+      gameoverScreen: document.getElementById('gameover-screen'),
+      victoryScreen: document.getElementById('victory-screen'),
+      infoModal: document.getElementById('info-modal'),
+      touchControls: document.getElementById('touch-controls'),
+      startLights: document.getElementById('start-lights'),
+      countdownText: document.getElementById('countdown-text'),
+      light1: document.getElementById('light-1'),
+      light2: document.getElementById('light-2'),
+      light3: document.getElementById('light-3'),
+      mudSplatter: document.getElementById('mud-splatter'),
+      rainOverlay: document.getElementById('rain-overlay'),
+      flashOverlay: document.getElementById('flash-overlay'),
+      speedVal: document.getElementById('speed-val'),
+      posVal: document.getElementById('pos-val'),
+      tractionWarning: document.getElementById('traction-warning'),
+      fuelVal: document.getElementById('fuel-val'),
+      fuelBarFill: document.getElementById('fuel-bar-fill'),
+      healthVal: document.getElementById('health-val'),
+      healthBarFill: document.getElementById('health-bar-fill'),
+      checkpointText: document.getElementById('checkpoint-text'),
+      seedCounter: document.getElementById('seed-counter'),
+      floatingAlert: document.getElementById('floating-alert'),
+      // Minimap dots
+      dotPlayer: document.getElementById('car-dot-player'),
+      dotAI: [
+        document.getElementById('car-dot-1'),
+        document.getElementById('car-dot-2'),
+        document.getElementById('car-dot-3'),
+        document.getElementById('car-dot-4')
+      ],
+      // Garage DOM
+      carName: document.getElementById('car-name'),
+      carTag: document.getElementById('car-tag'),
+      carDesc: document.getElementById('car-desc'),
+      carAbility: document.getElementById('car-ability'),
+      attrSpeed: document.getElementById('attr-speed'),
+      attrTraction: document.getElementById('attr-traction'),
+      attrDurability: document.getElementById('attr-durability'),
+      attrFuel: document.getElementById('attr-fuel'),
+      // Game Over DOM
+      statDist: document.getElementById('stat-dist'),
+      statSeeds: document.getElementById('stat-seeds'),
+      statFauna: document.getElementById('stat-fauna'),
+      statScore: document.getElementById('stat-score'),
+      statRecord: document.getElementById('stat-record'),
+      gameoverReason: document.getElementById('gameover-reason'),
+      // Victory DOM
+      vicTitle: document.getElementById('vic-title'),
+      vicSubtitle: document.getElementById('vic-subtitle'),
+      vicBadge: document.getElementById('vic-badge'),
+      vicTrophy: document.getElementById('vic-trophy'),
+      vicTime: document.getElementById('vic-time'),
+      vicSeeds: document.getElementById('vic-seeds'),
+      vicFauna: document.getElementById('vic-fauna'),
+      vicScore: document.getElementById('vic-score')
+    };
+
+    // Botões
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      const active = window.gameAudio.toggle();
+      document.getElementById('btn-sound').innerText = active ? '🔊' : '🔇';
+    });
+
+    document.getElementById('btn-info').addEventListener('click', () => {
+      this.dom.infoModal.classList.remove('hidden');
+    });
+
+    document.getElementById('btn-close-info').addEventListener('click', () => {
+      this.dom.infoModal.classList.add('hidden');
+    });
+
+    document.getElementById('btn-prev-car').addEventListener('click', () => {
+      this.selectedCarIndex = (this.selectedCarIndex - 1 + this.vehicleKeys.length) % this.vehicleKeys.length;
+      this.currentCarData = window.VEHICLES[this.vehicleKeys[this.selectedCarIndex]];
+      this.updateGarageUI();
+      this.renderGaragePreview();
+      window.gameAudio.playHorn(this.currentCarData.id);
+    });
+
+    document.getElementById('btn-next-car').addEventListener('click', () => {
+      this.selectedCarIndex = (this.selectedCarIndex + 1) % this.vehicleKeys.length;
+      this.currentCarData = window.VEHICLES[this.vehicleKeys[this.selectedCarIndex]];
+      this.updateGarageUI();
+      this.renderGaragePreview();
+      window.gameAudio.playHorn(this.currentCarData.id);
+    });
+
+    document.getElementById('btn-start').addEventListener('click', () => this.startRaceCountdown());
+    document.getElementById('btn-retry').addEventListener('click', () => this.startRaceCountdown());
+    document.getElementById('btn-play-again').addEventListener('click', () => this.startRaceCountdown());
+
+    document.getElementById('btn-garage-return').addEventListener('click', () => this.returnToGarage());
+    document.getElementById('btn-vic-garage').addEventListener('click', () => this.returnToGarage());
+    document.getElementById('btn-quit').addEventListener('click', () => this.returnToGarage());
+    document.getElementById('btn-resume').addEventListener('click', () => this.resumeGame());
+
+    // Suporte a mobile touch buttons
+    this.setupTouchButton('btn-left', 'left');
+    this.setupTouchButton('btn-right', 'right');
+    this.setupTouchButton('btn-gas', 'gas');
+    this.setupTouchButton('btn-brake', 'brake');
+    document.getElementById('btn-horn').addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.triggerHornOrAbility();
+    });
+    document.getElementById('btn-horn').addEventListener('mousedown', () => {
+      this.triggerHornOrAbility();
+    });
+  }
+
+  setupTouchButton(id, inputKey) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const activate = (e) => { e.preventDefault(); this.touchInputs[inputKey] = true; };
+    const deactivate = (e) => { e.preventDefault(); this.touchInputs[inputKey] = false; };
+    el.addEventListener('touchstart', activate);
+    el.addEventListener('touchend', deactivate);
+    el.addEventListener('mousedown', activate);
+    el.addEventListener('mouseup', deactivate);
+    el.addEventListener('mouseleave', deactivate);
+  }
+
+  initInputs() {
+    window.addEventListener('keydown', (e) => {
+      this.keys[e.key.toLowerCase()] = true;
+      this.keys[e.code] = true;
+
+      if ((e.key === 'p' || e.key === 'P' || e.key === 'Escape') && this.currentState === this.STATE.PLAYING) {
+        this.pauseGame();
+      }
+
+      if (e.code === 'Space' && (this.currentState === this.STATE.PLAYING || this.currentState === this.STATE.COUNTDOWN)) {
+        e.preventDefault();
+        this.triggerHornOrAbility();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      this.keys[e.key.toLowerCase()] = false;
+      this.keys[e.code] = false;
+    });
+
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      this.dom.touchControls.classList.remove('hidden');
+    }
+  }
+
+  updateGarageUI() {
+    const car = this.currentCarData;
+    this.dom.carName.innerText = car.name;
+    this.dom.carTag.innerText = car.tag;
+    this.dom.carDesc.innerText = car.desc;
+    this.dom.carAbility.innerText = car.ability;
+
+    this.dom.attrSpeed.style.width = `${(car.maxSpeed / 140) * 100}%`;
+    this.dom.attrTraction.style.width = `${car.mudTraction * 100}%`;
+    this.dom.attrDurability.style.width = `${(car.durability / 240) * 100}%`;
+    this.dom.attrFuel.style.width = `${car.fuelEfficiency * 100}%`;
+  }
+
+  renderGaragePreview() {
+    const ctx = this.previewCtx;
+    ctx.clearRect(0, 0, 220, 150);
+
+    ctx.fillStyle = '#9e2a0b';
+    ctx.fillRect(0, 0, 220, 150);
+    ctx.fillStyle = '#6e1d08';
+    ctx.beginPath();
+    ctx.ellipse(110, 85, 80, 45, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.currentCarData.draw(ctx, 110, 75, this.currentCarData.width * 1.3, this.currentCarData.height * 1.3, false, false);
+  }
+
+  // ==========================================
+  // INÍCIO DA CORRIDA & GRID DE LARGADA
+  // ==========================================
+  startRaceCountdown() {
+    this.currentCarData = window.VEHICLES[this.vehicleKeys[this.selectedCarIndex]];
+    
+    // Configura o Jogador na 5ª posição do grid de largada
+    this.player = {
+      x: 350,
+      y: 470,
+      vx: 0,
+      speed: 0,
+      targetSpeed: 0,
+      health: this.currentCarData.durability,
+      maxHealth: this.currentCarData.durability,
+      fuel: 100,
+      distanceKm: 0,
+      isBraking: false,
+      isBoosting: false,
+      boostTimer: 0,
+      plankTimer: 0,
+      isInMud: false,
+      inBridgeZone: false,
+      slipstream: false
+    };
+
+    // Cria os outros 4 veículos como Rivais IA
+    this.opponents = [];
+    const otherKeys = this.vehicleKeys.filter(k => k !== this.currentCarData.id);
+    
+    const startGridPositions = [
+      { x: 260, y: 310, distOffset: 0.05 }, // 1º do grid
+      { x: 500, y: 340, distOffset: 0.04 }, // 2º do grid
+      { x: 290, y: 390, distOffset: 0.025 },// 3º do grid
+      { x: 480, y: 430, distOffset: 0.015 } // 4º do grid
+    ];
+
+    otherKeys.forEach((key, idx) => {
+      const vData = window.VEHICLES[key];
+      const pos = startGridPositions[idx];
+      this.opponents.push({
+        id: vData.id,
+        carData: vData,
+        x: pos.x,
+        y: pos.y,
+        vx: 0,
+        speed: 0,
+        distanceKm: pos.distOffset,
+        targetLane: pos.x,
+        laneTimer: Math.random() * 2,
+        isInMud: false,
+        name: vData.name,
+        colorDot: idx
+      });
+    });
+
+    this.raceConfig.raceTime = 0;
+    this.raceConfig.currentRank = 5;
+    this.raceConfig.prevRank = 5;
+
+    this.stats.seedsCollected = 0;
+    this.stats.faunaRespected = 0;
+    this.stats.score = 0;
+
+    this.weather = 'sun';
+    this.weatherTimer = 0;
+    this.obstacleManager.reset();
+    this.dustParticles = [];
+
+    // Ocultar telas de menu/game over e exibir HUD + Semáforo
+    this.dom.menuScreen.classList.add('hidden');
+    this.dom.pauseScreen.classList.add('hidden');
+    this.dom.gameoverScreen.classList.add('hidden');
+    this.dom.victoryScreen.classList.add('hidden');
+    this.dom.hud.classList.remove('hidden');
+
+    this.countdownTimer = 3.6;
+    this.currentState = this.STATE.COUNTDOWN;
+    this.dom.startLights.classList.remove('hidden');
+    this.lastBeepCount = 4;
+
+    window.gameAudio.startEngine(this.currentCarData.id);
+  }
+
+  // Atualiza a contagem regressiva 3, 2, 1, VAI!
+  updateCountdown(delta) {
+    this.countdownTimer -= delta;
+
+    const countInt = Math.ceil(this.countdownTimer);
+
+    if (countInt === 3) {
+      this.dom.light1.className = 'light light-red active';
+      this.dom.light2.className = 'light light-yellow';
+      this.dom.light3.className = 'light light-green';
+      this.dom.countdownText.innerText = '3';
+      if (this.lastBeepCount !== 3) {
+        window.gameAudio.playCountdownBeep(false);
+        this.lastBeepCount = 3;
+      }
+    } else if (countInt === 2) {
+      this.dom.light1.className = 'light light-red active';
+      this.dom.light2.className = 'light light-yellow active';
+      this.dom.light3.className = 'light light-green';
+      this.dom.countdownText.innerText = '2';
+      if (this.lastBeepCount !== 2) {
+        window.gameAudio.playCountdownBeep(false);
+        this.lastBeepCount = 2;
+      }
+    } else if (countInt === 1) {
+      this.dom.light1.className = 'light light-red active';
+      this.dom.light2.className = 'light light-yellow active';
+      this.dom.light3.className = 'light light-green active';
+      this.dom.countdownText.innerText = '1';
+      if (this.lastBeepCount !== 1) {
+        window.gameAudio.playCountdownBeep(false);
+        this.lastBeepCount = 1;
+      }
+    } else if (this.countdownTimer <= 0) {
+      // LARGADA!
+      this.dom.countdownText.innerText = 'LARGADA! 🏁';
+      if (this.lastBeepCount !== 0) {
+        window.gameAudio.playCountdownBeep(true);
+        this.lastBeepCount = 0;
+      }
+      setTimeout(() => {
+        this.dom.startLights.classList.add('hidden');
+      }, 700);
+
+      this.currentState = this.STATE.PLAYING;
+      this.showAlert("🚦 LARGADA AUTORIZADA! PISA FUNDO!");
+    }
+  }
+
+  pauseGame() {
+    if (this.currentState === this.STATE.PLAYING) {
+      this.currentState = this.STATE.PAUSED;
+      this.dom.pauseScreen.classList.remove('hidden');
+      window.gameAudio.stopEngine();
+    }
+  }
+
+  resumeGame() {
+    if (this.currentState === this.STATE.PAUSED) {
+      this.currentState = this.STATE.PLAYING;
+      this.dom.pauseScreen.classList.add('hidden');
+      window.gameAudio.startEngine(this.currentCarData.id);
+    }
+  }
+
+  returnToGarage() {
+    this.currentState = this.STATE.MENU;
+    window.gameAudio.stopEngine();
+    window.gameAudio.stopRain();
+
+    this.dom.startLights.classList.add('hidden');
+    this.dom.hud.classList.add('hidden');
+    this.dom.pauseScreen.classList.add('hidden');
+    this.dom.gameoverScreen.classList.add('hidden');
+    this.dom.victoryScreen.classList.add('hidden');
+    this.dom.menuScreen.classList.remove('hidden');
+    this.updateGarageUI();
+    this.renderGaragePreview();
+  }
+
+  gameOver(reason) {
+    this.currentState = this.STATE.GAMEOVER;
+    window.gameAudio.playGameOver();
+
+    if (this.stats.score > this.stats.highScore) {
+      this.stats.highScore = this.stats.score;
+      localStorage.setItem('transamazonica_highscore', this.stats.highScore.toString());
+    }
+
+    this.dom.gameoverReason.innerText = reason;
+    this.dom.statDist.innerText = `${this.player.distanceKm.toFixed(1)} km`;
+    this.dom.statSeeds.innerText = this.stats.seedsCollected;
+    this.dom.statFauna.innerText = this.stats.faunaRespected;
+    this.dom.statScore.innerText = Math.floor(this.stats.score);
+    this.dom.statRecord.innerText = `${this.stats.highScore} pts`;
+
+    this.dom.hud.classList.add('hidden');
+    this.dom.gameoverScreen.classList.remove('hidden');
+  }
+
+  finishRace() {
+    this.currentState = this.STATE.VICTORY;
+    window.gameAudio.playVictory();
+
+    // Posição final conquistada
+    const rank = this.raceConfig.currentRank;
+    const minutes = Math.floor(this.raceConfig.raceTime / 60);
+    const seconds = Math.floor(this.raceConfig.raceTime % 60);
+    const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    let rankBonus = 0;
+    if (rank === 1) {
+      this.dom.vicTrophy.innerText = '🏆';
+      this.dom.vicTitle.innerText = 'CHEGADA EM 1º LUGAR! CAMPEÃO!';
+      this.dom.vicSubtitle.innerText = `Você dominou a Transamazônica com seu ${this.currentCarData.name}!`;
+      this.dom.vicBadge.innerText = '🥇 CAMPEÃO DA BR-230';
+      this.dom.vicBadge.style.background = 'linear-gradient(135deg, #f1c40f, #d35400)';
+      rankBonus = 4000;
+    } else if (rank === 2) {
+      this.dom.vicTrophy.innerText = '🥈';
+      this.dom.vicTitle.innerText = 'CHEGADA EM 2º LUGAR! PÓDIO!';
+      this.dom.vicSubtitle.innerText = 'Excelente corrida pelas trilhas de terra vermelha da Amazônia!';
+      this.dom.vicBadge.innerText = '🥈 VICE-CAMPEÃO (2º LUGAR)';
+      this.dom.vicBadge.style.background = 'linear-gradient(135deg, #bdc3c7, #7f8c8d)';
+      rankBonus = 2500;
+    } else if (rank === 3) {
+      this.dom.vicTrophy.innerText = '🥉';
+      this.dom.vicTitle.innerText = 'CHEGADA EM 3º LUGAR! PÓDIO!';
+      this.dom.vicSubtitle.innerText = 'Conquistou o pódio na rodovia mais desafiadora do Brasil!';
+      this.dom.vicBadge.innerText = '🥉 3º LUGAR NO PÓDIO';
+      this.dom.vicBadge.style.background = 'linear-gradient(135deg, #e67e22, #a04000)';
+      rankBonus = 1500;
+    } else {
+      this.dom.vicTrophy.innerText = '🏁';
+      this.dom.vicTitle.innerText = `CHEGADA EM ${rank}º LUGAR!`;
+      this.dom.vicSubtitle.innerText = 'Você completou os 6 km da BR-230 e entregou as mudas com segurança!';
+      this.dom.vicBadge.innerText = `🏁 ${rank}º LUGAR CONCLUÍDO`;
+      this.dom.vicBadge.style.background = 'linear-gradient(135deg, #27ae60, #145a32)';
+      rankBonus = 800;
+    }
+
+    this.stats.score += rankBonus;
+    if (this.stats.score > this.stats.highScore) {
+      this.stats.highScore = this.stats.score;
+      localStorage.setItem('transamazonica_highscore', this.stats.highScore.toString());
+    }
+
+    this.dom.vicTime.innerText = timeStr;
+    this.dom.vicSeeds.innerText = this.stats.seedsCollected;
+    this.dom.vicFauna.innerText = this.stats.faunaRespected;
+    this.dom.vicScore.innerText = Math.floor(this.stats.score);
+
+    this.dom.hud.classList.add('hidden');
+    this.dom.victoryScreen.classList.remove('hidden');
+  }
+
+  // ==========================================
+  // HABILIDADES & BUZINA DE CORRIDA
+  // ==========================================
+  triggerHornOrAbility() {
+    if (this.currentState !== this.STATE.PLAYING && this.currentState !== this.STATE.COUNTDOWN) return;
+
+    window.gameAudio.playHorn(this.currentCarData.id);
+
+    if (this.currentCarData.id === 'uno' && this.player.boostTimer <= 0 && this.currentState === this.STATE.PLAYING) {
+      this.player.boostTimer = 4.0;
+      this.player.isBoosting = true;
+      window.gameAudio.playPowerup();
+      this.showAlert("⚡ MODO FIRMA ATIVADO! SUPERROTAÇÃO!");
+    }
+
+    const alerted = this.obstacleManager.hornAlert(
+      this.player.x,
+      this.player.y,
+      this.currentCarData.id === 'caminhao' ? 550 : 360
+    );
+
+    if (alerted > 0) {
+      const bonus = alerted * 80;
+      this.stats.score += bonus;
+      this.stats.faunaRespected += alerted;
+      this.showAlert(`📢 Fauna Protegida! +${bonus} pts 🌿`);
+    }
+  }
+
+  showAlert(text) {
+    const alertEl = this.dom.floatingAlert;
+    alertEl.innerText = text;
+    alertEl.classList.remove('hidden');
+    alertEl.style.animation = 'none';
+    alertEl.offsetHeight;
+    alertEl.style.animation = 'floatFade 1.8s forwards';
+    setTimeout(() => {
+      alertEl.classList.add('hidden');
+    }, 1800);
+  }
+
+  addDustParticle(x, y, isRed = true) {
+    this.dustParticles.push({
+      x: x + (Math.random() * 12 - 6),
+      y: y,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 1.5 + Math.random() * 2,
+      size: 4 + Math.random() * 5,
+      color: isRed ? 'rgba(158, 42, 11, 0.45)' : 'rgba(200, 200, 200, 0.35)',
+      life: 0.8
+    });
+  }
+
+  // ==========================================
+  // GAME LOOP
+  // ==========================================
+  gameLoop(currentTime) {
+    const delta = Math.min((currentTime - this.lastTime) / 1000, 0.1);
+    this.lastTime = currentTime;
+
+    if (this.currentState === this.STATE.COUNTDOWN) {
+      this.updateCountdown(delta);
+    } else if (this.currentState === this.STATE.PLAYING) {
+      this.update(delta);
+    }
+
+    this.render();
+    requestAnimationFrame((t) => this.gameLoop(t));
+  }
+
+  update(delta) {
+    const car = this.currentCarData;
+    const p = this.player;
+
+    this.raceConfig.raceTime += delta;
+    this.updateWeather(delta);
+
+    // 1. Inputs do Jogador
+    const isUp = this.keys['arrowup'] || this.keys['w'] || this.touchInputs.gas;
+    const isDown = this.keys['arrowdown'] || this.keys['s'] || this.touchInputs.brake;
+    const isLeft = this.keys['arrowleft'] || this.keys['a'] || this.touchInputs.left;
+    const isRight = this.keys['arrowright'] || this.keys['d'] || this.touchInputs.right;
+
+    p.isBraking = isDown;
+
+    if (p.boostTimer > 0) {
+      p.boostTimer -= delta;
+      p.isBoosting = p.boostTimer > 0;
+    }
+    if (p.plankTimer > 0) {
+      p.plankTimer -= delta;
+    }
+
+    // 2. Fatores de Terreno & Vácuo (Slipstream)
+    let currentTraction = car.mudTraction;
+    if (p.plankTimer > 0) currentTraction = 1.0;
+
+    let speedLimit = car.maxSpeed;
+    if (p.isBoosting) speedLimit += 45;
+    if (p.slipstream) speedLimit += 25; // Ganho de vácuo
+
+    if (p.isInMud && p.plankTimer <= 0) {
+      speedLimit *= (0.35 + currentTraction * 0.45);
+      if (Math.random() < 0.4) {
+        this.obstacleManager.addMudParticles(p.x, p.y + car.height/2, 2);
+      }
+    }
+
+    // 3. Aceleração do Jogador
+    if (isUp && p.fuel > 0) {
+      p.targetSpeed = speedLimit;
+      const boostMult = p.isBoosting ? 2.2 : (p.slipstream ? 1.4 : 1.0);
+      p.speed += car.accel * boostMult * delta * 60;
+    } else if (isDown) {
+      p.targetSpeed = 0;
+      p.speed -= car.brake * delta * 60;
+    } else {
+      const friction = p.isInMud ? 0.35 : 0.12;
+      p.speed = Math.max(0, p.speed - friction * delta * 60);
+    }
+
+    p.speed = Math.max(0, Math.min(p.speed, speedLimit));
+
+    // Efeito de poeira nas rodas
+    if (p.speed > 25 && Math.random() < 0.35) {
+      this.addDustParticle(p.x - 12, p.y + car.height/2);
+      this.addDustParticle(p.x + 12, p.y + car.height/2);
+    }
+
+    // 4. Direção e Estabilidade
+    let handlingForce = car.handling;
+    if (p.isInMud && currentTraction < 0.7) handlingForce *= 0.6;
+
+    if (isLeft) p.vx -= handlingForce * delta * 8;
+    if (isRight) p.vx += handlingForce * delta * 8;
+    p.vx *= 0.82;
+    p.x += p.vx;
+
+    // Limites da Estrada
+    const minX = 200;
+    const maxX = 600;
+    if (p.x < minX) { p.x = minX; p.vx = 0; p.speed *= 0.95; }
+    if (p.x > maxX) { p.x = maxX; p.vx = 0; p.speed *= 0.95; }
+
+    // 5. Consumo e Distância do Jogador
+    if (p.speed > 5) {
+      const fuelBurn = (0.016 / car.fuelEfficiency) * (p.speed / 100) * (p.isBoosting ? 2.0 : 1.0);
+      p.fuel = Math.max(0, p.fuel - fuelBurn * delta * 60);
+
+      const distInc = (p.speed / 3600) * delta * 12;
+      p.distanceKm += distInc;
+      this.stats.score += p.speed * delta * 0.8;
+    }
+
+    // 6. Atualizar IA dos Adversários
+    this.updateOpponentsAI(delta);
+
+    // 7. Calcular Posições na Corrida em Tempo Real
+    this.calculateRaceRankings();
+
+    // 8. Checar Vácuo (Slipstream) atrás dos rivais
+    this.checkSlipstream();
+
+    // 9. Checar Colisões com Perigos e entre Carros
+    this.obstacleManager.update(p.speed, delta, this.roadCurvature, p.inBridgeZone, this.weather);
+    this.checkCollisions(delta);
+
+    // 10. Atualizar Partículas de Poeira
+    for (let i = this.dustParticles.length - 1; i >= 0; i--) {
+      const dp = this.dustParticles[i];
+      dp.x += dp.vx;
+      dp.y += dp.vy + (p.speed * 0.08);
+      dp.size = Math.max(0, dp.size - delta * 3);
+      dp.life -= delta;
+      if (dp.life <= 0 || dp.size <= 0) {
+        this.dustParticles.splice(i, 1);
+      }
+    }
+
+    // 11. Checar Condições de Fim de Jogo
+    if (p.fuel <= 0 && p.speed < 2) {
+      this.gameOver("Você ficou sem combustível no meio da floresta!");
+      return;
+    }
+    if (p.health <= 0) {
+      this.gameOver("Seu veículo não resistiu às crateras da Transamazônica!");
+      return;
+    }
+    if (p.distanceKm >= this.raceConfig.targetDistanceKm) {
+      this.finishRace();
+      return;
+    }
+
+    // 12. Áudio & HUD
+    window.gameAudio.updateEngine(p.speed / car.maxSpeed, isUp, car.id);
+    if (this.cameraShake > 0) {
+      this.cameraShake = Math.max(0, this.cameraShake - delta * 15);
+    }
+    this.updateHUD();
+  }
+
+  // ==========================================
+  // INTELIGÊNCIA ARTIFICIAL DOS 4 RIVAIS
+  // ==========================================
+  updateOpponentsAI(delta) {
+    const p = this.player;
+
+    for (const ai of this.opponents) {
+      const carData = ai.carData;
+
+      // Velocidade de cruzeiro da IA de acordo com os atributos do carro
+      let aiMaxSpeed = carData.maxSpeed * 0.96;
+      let aiTraction = carData.mudTraction;
+
+      // Checar se a IA está sobre lamaçal
+      ai.isInMud = false;
+      for (const h of this.obstacleManager.hazards) {
+        if (h.type === 'mud' && Math.hypot(h.x - ai.x, h.y - ai.y) < 55) {
+          ai.isInMud = true;
+          break;
+        }
+      }
+
+      if (ai.isInMud) {
+        aiMaxSpeed *= (0.35 + aiTraction * 0.45);
+        if (Math.random() < 0.2) {
+          this.obstacleManager.addMudParticles(ai.x, ai.y + carData.height/2, 1);
+        }
+      }
+
+      // Aceleração da IA
+      if (ai.speed < aiMaxSpeed) {
+        ai.speed += carData.accel * delta * 50;
+      } else {
+        ai.speed -= 0.15 * delta * 60;
+      }
+
+      // Distância percorrida pela IA na BR-230
+      const aiDistInc = (ai.speed / 3600) * delta * 12;
+      ai.distanceKm += aiDistInc;
+
+      // Posição Y na tela relativa ao jogador (efeito de câmera do jogo de corrida)
+      // Se a IA tiver maior distância que o jogador, ela fica mais acima na tela (-Y)
+      const distDiffKm = ai.distanceKm - p.distanceKm;
+      // 1 km = 3500 pixels de pista
+      ai.y = p.y - (distDiffKm * 3500);
+
+      // Comportamento de Direção da IA (Desvio de obstáculos e ultrapassagem)
+      ai.laneTimer -= delta;
+      if (ai.laneTimer <= 0) {
+        ai.laneTimer = 1.5 + Math.random() * 2;
+        // Escolhe uma linha na pista longe de buracos e do jogador
+        let targetX = 240 + Math.random() * 320;
+        if (Math.abs(targetX - p.x) < 40 && Math.abs(ai.y - p.y) < 100) {
+          targetX = (p.x > 400) ? 260 : 540;
+        }
+        ai.targetLane = targetX;
+      }
+
+      // Suavização do movimento lateral da IA
+      const dx = ai.targetLane - ai.x;
+      ai.x += Math.sign(dx) * Math.min(Math.abs(dx), carData.handling * delta * 40);
+
+      // Poeira das rodas dos rivais
+      if (ai.speed > 25 && ai.y > -80 && ai.y < 680 && Math.random() < 0.25) {
+        this.addDustParticle(ai.x - 10, ai.y + carData.height/2);
+        this.addDustParticle(ai.x + 10, ai.y + carData.height/2);
+      }
+    }
+  }
+
+  // ==========================================
+  // CÁLCULO DE POSIÇÕES DA CORRIDA (1º AO 5º)
+  // ==========================================
+  calculateRaceRankings() {
+    const allRacers = [
+      { isPlayer: true, distanceKm: this.player.distanceKm, name: this.currentCarData.name },
+      ...this.opponents.map(ai => ({ isPlayer: false, distanceKm: ai.distanceKm, name: ai.name }))
+    ];
+
+    // Ordena do que andou mais (1º) para o que andou menos (5º)
+    allRacers.sort((a, b) => b.distanceKm - a.distanceKm);
+
+    const playerIndex = allRacers.findIndex(r => r.isPlayer);
+    const newRank = playerIndex + 1;
+
+    if (newRank !== this.raceConfig.currentRank) {
+      if (newRank < this.raceConfig.currentRank) {
+        // Ultrapassou um rival!
+        window.gameAudio.playPowerup();
+        this.showAlert(`⬆️ Ultrapassou! Você assumiu o ${newRank}º LUGAR! 🏎️💨`);
+      } else {
+        // Foi ultrapassado
+        this.showAlert(`⬇️ Oponente te ultrapassou! Você caiu para ${newRank}º.`);
+      }
+      this.raceConfig.currentRank = newRank;
+    }
+  }
+
+  // ==========================================
+  // MECÂNICA DE VÁCUO (SLIPSTREAM)
+  // ==========================================
+  checkSlipstream() {
+    const p = this.player;
+    p.slipstream = false;
+
+    for (const ai of this.opponents) {
+      // Se a IA estiver à frente (entre 30px e 140px acima) e na mesma linha X (+/- 25px)
+      if (ai.y < p.y && (p.y - ai.y) < 140 && (p.y - ai.y) > 30) {
+        if (Math.abs(ai.x - p.x) < 26) {
+          p.slipstream = true;
+          if (Math.random() < 0.3) {
+            window.gameAudio.playSlipstream();
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // ==========================================
+  // CLIMA DINÂMICO
+  // ==========================================
+  updateWeather(delta) {
+    this.weatherTimer += delta;
+    if (this.weatherTimer > 25) {
+      this.weatherTimer = 0;
+      const weathers = ['sun', 'fog', 'rain'];
+      const nextIdx = (weathers.indexOf(this.weather) + 1) % weathers.length;
+      this.weather = weathers[nextIdx];
+
+      if (this.weather === 'rain') {
+        this.dom.rainOverlay.classList.add('active');
+        window.gameAudio.startRain();
+        this.showAlert("🌧️ Temporal Amazônico! Pista de barro ensaboada!");
+      } else if (this.weather === 'fog') {
+        this.dom.rainOverlay.classList.remove('active');
+        window.gameAudio.stopRain();
+        this.showAlert("🌫️ Neblina da Manhã sobre a Transamazônica!");
+      } else {
+        this.dom.rainOverlay.classList.remove('active');
+        window.gameAudio.stopRain();
+      }
+    }
+
+    if (this.weather === 'rain') {
+      this.lightningTimer += delta;
+      if (this.lightningTimer > 8 + Math.random() * 6) {
+        this.lightningTimer = 0;
+        this.dom.flashOverlay.classList.add('flash');
+        window.gameAudio.playThunder();
+        setTimeout(() => {
+          this.dom.flashOverlay.classList.remove('flash');
+        }, 120);
+      }
+    }
+  }
+
+  // ==========================================
+  // COLISÕES (OBSTÁCULOS & CARRO-A-CARRO)
+  // ==========================================
+  checkCollisions(delta) {
+    const p = this.player;
+    const car = this.currentCarData;
+    let mudContact = false;
+
+    // 1. Colisão com Lama e Perigos
+    for (let i = this.obstacleManager.hazards.length - 1; i >= 0; i--) {
+      const h = this.obstacleManager.hazards[i];
+      const dist = Math.hypot(h.x - p.x, h.y - p.y);
+
+      if (h.type === 'mud') {
+        if (dist < (h.width/2 + car.width/3)) {
+          mudContact = true;
+          if (!p.isInMud) window.gameAudio.playMudSplash();
+        }
+      } else if (h.type === 'pothole' || h.type === 'bridge_hole') {
+        if (dist < (h.width/2 + car.width/4)) {
+          let dmg = h.damage || 18;
+          if (car.id === 'fusca') dmg *= 0.5;
+          if (car.id === 'caminhao') dmg *= 0.3;
+
+          p.health = Math.max(0, p.health - dmg);
+          p.speed *= 0.75;
+          this.cameraShake = 8;
+          window.gameAudio.playImpact();
+          this.obstacleManager.hazards.splice(i, 1);
+          this.showAlert("💥 Cratera na Pista! Dano no Chassi!");
+        }
+      } else if (h.type === 'log') {
+        if (Math.abs(h.x - p.x) < (h.width/2 + car.width/3) && Math.abs(h.y - p.y) < 25) {
+          if (car.id === 'caminhao') {
+            this.obstacleManager.hazards.splice(i, 1);
+            p.health = Math.max(0, p.health - 5);
+            window.gameAudio.playImpact();
+            this.showAlert("🪵 Caminhão MB 1113 Esmagou o Tronco!");
+          } else {
+            p.health = Math.max(0, p.health - (h.damage || 30));
+            p.speed *= 0.4;
+            this.cameraShake = 12;
+            window.gameAudio.playImpact();
+            this.obstacleManager.hazards.splice(i, 1);
+            this.showAlert("⚠️ Impacto com Tronco Caído!");
+          }
+        }
+      }
+    }
+
+    p.isInMud = mudContact;
+    if (p.isInMud) this.dom.mudSplatter.classList.add('active');
+    else this.dom.mudSplatter.classList.remove('active');
+
+    // 2. Colisão Lateral Entre Carros Rivais (Empurrão de Corrida)
+    for (const ai of this.opponents) {
+      if (Math.abs(ai.y - p.y) < 45 && Math.abs(ai.x - p.x) < (car.width/2 + ai.carData.width/2 + 2)) {
+        // Empurrão lateral
+        const pushDir = Math.sign(p.x - ai.x) || 1;
+        p.x += pushDir * 8;
+        ai.x -= pushDir * 8;
+        p.vx += pushDir * 3;
+        ai.speed *= 0.92;
+        p.speed *= 0.95;
+
+        this.cameraShake = 4;
+        window.gameAudio.playCarBump();
+        this.addDustParticle((p.x + ai.x)/2, (p.y + ai.y)/2);
+      }
+    }
+
+    // 3. Colisão com Fauna Amazônica
+    for (let i = this.obstacleManager.wildlife.length - 1; i >= 0; i--) {
+      const w = this.obstacleManager.wildlife[i];
+      const dist = Math.hypot(w.x - p.x, w.y - p.y);
+
+      if (dist < 32) {
+        this.stats.score = Math.max(0, this.stats.score - 400);
+        p.health = Math.max(0, p.health - 15);
+        p.speed *= 0.6;
+        this.cameraShake = 10;
+        window.gameAudio.playImpact();
+        this.obstacleManager.wildlife.splice(i, 1);
+        this.showAlert("🚫 CUIDADO COM A FAUNA! Respeite os animais! (-400 pts)");
+      }
+    }
+
+    // 4. Colisão com Coletáveis
+    for (let i = this.obstacleManager.collectibles.length - 1; i >= 0; i--) {
+      const c = this.obstacleManager.collectibles[i];
+      const dist = Math.hypot(c.x - p.x, c.y - p.y);
+
+      if (dist < (c.radius + 20)) {
+        if (c.type === 'seed') {
+          this.stats.seedsCollected++;
+          this.stats.score += 150;
+          window.gameAudio.playSeedPickup();
+          this.showAlert("🌱 +1 Muda Amazônica! (+150 pts)");
+        } else if (c.type === 'fuel') {
+          p.fuel = Math.min(100, p.fuel + 35);
+          this.stats.score += 50;
+          window.gameAudio.playFuelPickup();
+          this.showAlert("⛽ Bio-Combustível Abastecido! (+35%)");
+        } else if (c.type === 'repair') {
+          p.health = Math.min(p.maxHealth, p.health + (p.maxHealth * 0.3));
+          this.stats.score += 50;
+          window.gameAudio.playPowerup();
+          this.showAlert("🔧 Veículo Reparado na Trilha!");
+        } else if (c.type === 'plank') {
+          p.plankTimer = 6.0;
+          this.stats.score += 80;
+          window.gameAudio.playPowerup();
+          this.showAlert("🪵 Pranchas de Madeira: Imunidade a Lama!");
+        }
+        this.obstacleManager.collectibles.splice(i, 1);
+      }
+    }
+  }
+
+  // ==========================================
+  // ATUALIZAÇÃO DO HUD & MINI-MAPA DE CORRIDA
+  // ==========================================
+  updateHUD() {
+    const p = this.player;
+    this.dom.speedVal.innerText = Math.round(p.speed);
+
+    // Posição no Grid (1º ao 5º)
+    this.dom.posVal.innerText = `${this.raceConfig.currentRank}º`;
+
+    // Status de Tração
+    if (p.isBoosting) {
+      this.dom.tractionWarning.innerText = '⚡ MODO FIRMA';
+      this.dom.tractionWarning.className = 'status-pill status-boost';
+    } else if (p.slipstream) {
+      this.dom.tractionWarning.innerText = '💨 VÁCUO ATIVO';
+      this.dom.tractionWarning.className = 'status-pill status-boost';
+    } else if (p.plankTimer > 0) {
+      this.dom.tractionWarning.innerText = '🪵 PRANCHAS ATIVAS';
+      this.dom.tractionWarning.className = 'status-pill status-boost';
+    } else if (p.isInMud) {
+      this.dom.tractionWarning.innerText = '⚠️ ATOLEIRO DENSO';
+      this.dom.tractionWarning.className = 'status-pill status-mud';
+    } else {
+      this.dom.tractionWarning.innerText = 'PISTA LIVRE';
+      this.dom.tractionWarning.className = 'status-pill status-normal';
+    }
+
+    // Combustível e Integridade
+    this.dom.fuelVal.innerText = `${Math.round(p.fuel)}%`;
+    this.dom.fuelBarFill.style.width = `${p.fuel}%`;
+
+    const healthPct = (p.health / p.maxHealth) * 100;
+    this.dom.healthVal.innerText = `${Math.round(healthPct)}%`;
+    this.dom.healthBarFill.style.width = `${healthPct}%`;
+
+    // Odômetro
+    this.dom.checkpointText.innerText = `Km ${p.distanceKm.toFixed(1)} / ${this.raceConfig.targetDistanceKm} km`;
+    this.dom.seedCounter.innerText = this.stats.seedsCollected;
+
+    // Mini-Mapa da Corrida (Posição dos 5 Carros no Traçado)
+    const targetKm = this.raceConfig.targetDistanceKm;
+    const playerPct = Math.min(98, Math.max(2, (p.distanceKm / targetKm) * 100));
+    this.dom.dotPlayer.style.left = `${playerPct}%`;
+
+    this.opponents.forEach((ai, idx) => {
+      const dotEl = this.dom.dotAI[idx];
+      if (dotEl) {
+        const aiPct = Math.min(98, Math.max(2, (ai.distanceKm / targetKm) * 100));
+        dotEl.style.left = `${aiPct}%`;
+      }
+    });
+  }
+
+  // ==========================================
+  // RENDERIZAÇÃO DO CANVAS
+  // ==========================================
+  render() {
+    const ctx = this.ctx;
+    ctx.clearRect(0, 0, this.width, this.height);
+
+    ctx.save();
+    if (this.cameraShake > 0) {
+      ctx.translate((Math.random() - 0.5) * this.cameraShake, (Math.random() - 0.5) * this.cameraShake);
+    }
+
+    // 1. Fundo da Mata Fechada
+    ctx.fillStyle = '#0b2618';
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    // 2. Margens de Terra
+    ctx.fillStyle = '#6e1d08';
+    ctx.fillRect(150, 0, 500, this.height);
+
+    // 3. Pista de Barro Vermelho BR-230
+    this.roadScrollY = (this.roadScrollY + this.player.speed * 0.25) % 80;
+    ctx.fillStyle = '#9e2a0b';
+    ctx.fillRect(200, 0, 400, this.height);
+
+    // Rastros de Pneu na Terra
+    ctx.strokeStyle = '#782006';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(310, 0); ctx.lineTo(310, this.height);
+    ctx.moveTo(490, 0); ctx.lineTo(490, this.height);
+    ctx.stroke();
+
+    // 4. Linha de Largada ou Chegada Quadriculada
+    if (this.player.distanceKm < 0.15) {
+      // Linha de Largada
+      const startY = 490 + (this.player.distanceKm * 3500);
+      this.drawCheckeredBanner(ctx, startY, "LARGADA");
+    } else if ((this.raceConfig.targetDistanceKm - this.player.distanceKm) < 0.2) {
+      // Linha de Chegada
+      const finishY = this.player.y - ((this.raceConfig.targetDistanceKm - this.player.distanceKm) * 3500);
+      this.drawCheckeredBanner(ctx, finishY, "CHEGADA ALTAMIRA 🏁");
+    }
+
+    // 5. Obstáculos, Fauna e Coletáveis
+    this.obstacleManager.draw(ctx);
+
+    // 6. Partículas de Poeira da Corrida
+    for (const dp of this.dustParticles) {
+      ctx.fillStyle = dp.color;
+      ctx.beginPath();
+      ctx.arc(dp.x, dp.y, dp.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 7. Desenhar Adversários IA na Pista
+    for (const ai of this.opponents) {
+      if (ai.y > -100 && ai.y < 700) {
+        ai.carData.draw(ctx, ai.x, ai.y, ai.carData.width, ai.carData.height, false, false);
+      }
+    }
+
+    // 8. Desenhar Veículo do Jogador
+    if (this.currentState !== this.STATE.MENU) {
+      this.currentCarData.draw(
+        ctx,
+        this.player.x,
+        this.player.y,
+        this.currentCarData.width,
+        this.currentCarData.height,
+        this.player.isBraking,
+        this.player.isBoosting
+      );
+
+      // Linhas de Vácuo (Slipstream)
+      if (this.player.slipstream) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(this.player.x - 14, this.player.y - 40);
+        ctx.lineTo(this.player.x - 14, this.player.y - 70);
+        ctx.moveTo(this.player.x + 14, this.player.y - 40);
+        ctx.lineTo(this.player.x + 14, this.player.y - 70);
+        ctx.stroke();
+      }
+    }
+
+    // 9. Árvores e Floresta nas Margens
+    this.drawAmazonTrees(ctx);
+
+    // 10. Clima
+    if (this.weather === 'fog') {
+      ctx.fillStyle = 'rgba(230, 245, 235, 0.25)';
+      ctx.fillRect(0, 0, this.width, this.height);
+    } else if (this.weather === 'rain') {
+      ctx.fillStyle = 'rgba(10, 25, 20, 0.28)';
+      ctx.fillRect(0, 0, this.width, this.height);
+    }
+
+    ctx.restore();
+  }
+
+  drawCheckeredBanner(ctx, y, text) {
+    if (y < -50 || y > 650) return;
+    const boxSize = 20;
+    for (let bx = 200; bx < 600; bx += boxSize) {
+      const isWhite = ((bx / boxSize) % 2 === 0);
+      ctx.fillStyle = isWhite ? '#ffffff' : '#000000';
+      ctx.fillRect(bx, y - 10, boxSize, 10);
+      ctx.fillStyle = isWhite ? '#000000' : '#ffffff';
+      ctx.fillRect(bx, y, boxSize, 10);
+    }
+    ctx.fillStyle = '#f1c40f';
+    ctx.font = 'bold 16px Chakra Petch';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, 400, y - 18);
+  }
+
+  drawAmazonTrees(ctx) {
+    for (const tree of this.trees) {
+      tree.y = (tree.y + this.player.speed * 0.15) % this.height;
+
+      ctx.save();
+      ctx.fillStyle = tree.color;
+      ctx.beginPath();
+      ctx.arc(tree.x, tree.y, tree.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#27ae60';
+      ctx.beginPath();
+      ctx.arc(tree.x - tree.size * 0.2, tree.y - tree.size * 0.2, tree.size * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  window.gameEngine = new GameEngine();
+});
+
+</script>
+  
+  
+  
+</body>
+</html>
