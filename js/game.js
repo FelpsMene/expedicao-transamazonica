@@ -358,18 +358,7 @@ class GameEngine {
     document.getElementById('btn-garage-return').addEventListener('click', () => this.returnToGarage());
     document.getElementById('btn-vic-garage').addEventListener('click', () => this.returnToGarage());
 
-    // CONTROLES DE TOQUE MOBILE
-    this.setupTouchButton('btn-left', 'left');
-    this.setupTouchButton('btn-right', 'right');
-    this.setupTouchButton('btn-gas', 'gas');
-    this.setupTouchButton('btn-brake', 'brake');
-    document.getElementById('btn-horn').addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      this.triggerHornOrAbility();
-    });
-    document.getElementById('btn-horn').addEventListener('mousedown', () => {
-      this.triggerHornOrAbility();
-    });
+
   }
 
   setupTouchButton(id, inputKey) {
@@ -894,7 +883,7 @@ class GameEngine {
     this.roadCenterOffset += (targetOffset - this.roadCenterOffset) * delta * 2.5;
 
     // Força centrífuga empurra o carro nas curvas
-    const curveForce = -Math.cos(curvePhase) * (stg.curveIntensity * 0.18) * (p.speed / 100);
+    const curveForce = -Math.cos(curvePhase) * (stg.curveIntensity * 0.05) * (p.speed / 100);
     p.vx += curveForce * delta * 4;
 
     // 2. SUBIDAS ÍNGREMES E DESCIDAS (FÍSICA DE RELEVO E BIO-COMBUSTÍVEL)
@@ -1101,7 +1090,7 @@ class GameEngine {
 
     for (const ai of this.opponents) {
       const carData = ai.carData;
-      let aiMaxSpeed = carData.maxSpeed * 0.96;
+      let aiMaxSpeed = carData.maxSpeed * 0.50;
       let aiTraction = carData.mudTraction;
 
       ai.isInMud = false;
@@ -1113,14 +1102,14 @@ class GameEngine {
       }
 
       if (ai.isInMud) {
-        aiMaxSpeed *= (0.35 + aiTraction * 0.45);
+        aiMaxSpeed *= (0.35 + aiTraction * 0.25);
         if (Math.random() < 0.2) {
           this.obstacleManager.addMudParticles(ai.x, ai.y + carData.height/2, 1);
         }
       }
 
       if (ai.speed < aiMaxSpeed) {
-        ai.speed += carData.accel * delta * 50;
+        ai.speed += carData.accel * delta * 40;
       } else {
         ai.speed -= 0.15 * delta * 60;
       }
@@ -1148,21 +1137,6 @@ class GameEngine {
 
       const dx = ai.targetLane - ai.x;
       ai.x += Math.sign(dx) * Math.min(Math.abs(dx), carData.handling * delta * 45);
-
-      // TÁTICA SUJA 2: SPRAY DE BARRO E PEDRAS NO PARA-BRISA DO JOGADOR
-      ai.dirtyAttackTimer -= delta;
-      if (ai.dirtyAttackTimer <= 0) {
-        ai.dirtyAttackTimer = 3 + Math.random() * 4;
-        // Se a IA estiver na frente do jogador na mesma linha
-        if (ai.y < p.y && (p.y - ai.y) < 140 && (p.y - ai.y) > 20 && Math.abs(ai.x - p.x) < 36) {
-          this.obstacleManager.addDirtySpray(ai.x, ai.y + carData.height/2);
-          this.dirtyMudTimer = 1.6;
-          this.dom.dirtyMudSplatter.classList.add('active');
-          p.health = Math.max(0, p.health - 4);
-          window.gameAudio.playImpact();
-          this.showAlert(`⚠️ ${ai.name} JOGOU SPRAY DE BARRO NO SEU PARA-BRISA! 💩`);
-        }
-      }
 
       if (ai.speed > 25 && ai.y > -80 && ai.y < 680 && Math.random() < 0.25) {
         this.addDustParticle(ai.x - 10, ai.y + carData.height/2);
@@ -1262,12 +1236,16 @@ class GameEngine {
   // ==========================================
   // DETECÇÃO DE COLISÕES
   // ==========================================
-  checkCollisions(delta) {
+checkCollisions(delta) {
     const p = this.player;
     const car = this.currentCarData;
     let mudContact = false;
     let canaletaContact = false;
     let floodContact = false;
+
+    // Fator de mitigação de dano baseado na durabilidade máxima do carro
+    // Veículos mais frágeis tomam dano proporcional, veículos pesados absorvem melhor
+    const defenseFactor = 100 / car.durability;
 
     for (let i = this.obstacleManager.hazards.length - 1; i >= 0; i--) {
       const h = this.obstacleManager.hazards[i];
@@ -1280,11 +1258,10 @@ class GameEngine {
         }
       } else if (h.type === 'barranco_rock') {
         if (dist < (h.width/2 + car.width/3)) {
-          let dmg = h.damage || 22;
-          if (car.id === 'caminhao') dmg *= 0.3;
-          if (car.id === 'fusca') dmg *= 0.6;
+          let baseDmg = (h.damage || 22) * defenseFactor;
+          if (car.id === 'fusca') baseDmg *= 0.5; // Habilidade Baja
 
-          p.health = Math.max(0, p.health - dmg);
+          p.health = Math.max(0, p.health - baseDmg);
           p.speed *= 0.7;
           this.cameraShake = 9;
           window.gameAudio.playImpact();
@@ -1294,9 +1271,13 @@ class GameEngine {
       } else if (h.type === 'canaleta') {
         if (Math.abs(h.x - p.x) < (h.width/2 + car.width/4) && Math.abs(h.y - p.y) < (h.height/2)) {
           canaletaContact = true;
+          // Agora canaleta aplica dano contínuo ao chassi se entrar rápido!
+          if (p.speed > 40) {
+            p.health = Math.max(0, p.health - (8 * delta * defenseFactor));
+          }
           if (!p.inCanaleta) {
             window.gameAudio.playMudSplash();
-            this.showAlert("⚠️ CAIU NA CANALETA! DIREÇÃO PRESA NO TRILHO!");
+            this.showAlert("⚠️ CAIU NA CANALETA! DANO NO CHASSI!");
           }
         }
       } else if (h.type === 'flood_water') {
@@ -1309,7 +1290,8 @@ class GameEngine {
         }
       } else if (h.type === 'stuck_truck') {
         if (Math.abs(h.x - p.x) < (h.width/2 + car.width/2) && Math.abs(h.y - p.y) < 38) {
-          p.health = Math.max(0, p.health - (h.damage || 40));
+          let baseDmg = (h.damage || 40) * defenseFactor;
+          p.health = Math.max(0, p.health - baseDmg);
           p.speed *= 0.3;
           this.cameraShake = 14;
           window.gameAudio.playImpact();
@@ -1318,16 +1300,15 @@ class GameEngine {
         }
       } else if (h.type === 'pothole' || h.type === 'bridge_hole') {
         if (dist < (h.width/2 + car.width/4)) {
-          let dmg = h.damage || 18;
-          if (car.id === 'fusca') dmg *= 0.5;
-          if (car.id === 'caminhao') dmg *= 0.3;
+          let baseDmg = (h.damage || 18) * defenseFactor;
+          if (car.id === 'fusca') baseDmg *= 0.5;
 
-          p.health = Math.max(0, p.health - dmg);
+          p.health = Math.max(0, p.health - baseDmg);
           p.speed *= 0.75;
           this.cameraShake = 8;
           window.gameAudio.playImpact();
           this.obstacleManager.hazards.splice(i, 1);
-          this.showAlert("💥 Cratera na Pista! Dano no Chassi!");
+          this.showAlert("💥 Cratera na Pista! Dano na Suspensão!");
         }
       } else if (h.type === 'log') {
         if (Math.abs(h.x - p.x) < (h.width/2 + car.width/3) && Math.abs(h.y - p.y) < 25) {
@@ -1337,7 +1318,8 @@ class GameEngine {
             window.gameAudio.playImpact();
             this.showAlert("🪵 Caminhão MB 1113 Esmagou o Tronco!");
           } else {
-            p.health = Math.max(0, p.health - (h.damage || 30));
+            let baseDmg = (h.damage || 30) * defenseFactor;
+            p.health = Math.max(0, p.health - baseDmg);
             p.speed *= 0.4;
             this.cameraShake = 12;
             window.gameAudio.playImpact();
@@ -1355,16 +1337,18 @@ class GameEngine {
     if (p.isInMud || p.inCanaleta) this.dom.mudSplatter.classList.add('active');
     else this.dom.mudSplatter.classList.remove('active');
 
-    // TÁTICA SUJA 3: EMPURRÕES VIOLENTOS ENTRE CARROS
+    // EMPURRÕES VIOLENTOS ENTRE CARROS (Aplica dano de colisão)
     for (const ai of this.opponents) {
       if (Math.abs(ai.y - p.y) < 45 && Math.abs(ai.x - p.x) < (car.width/2 + ai.carData.width/2 + 2)) {
-        // Empurrão lateral sujo: a IA empurra em direção ao acostamento/barranco
         const pushDir = Math.sign(p.x - ai.x) || 1;
         p.x += pushDir * 12;
-        ai.x -= pushDir * 4; // AI pesada quase não mexe
+        ai.x -= pushDir * 4;
         p.vx += pushDir * 4;
         ai.speed *= 0.94;
         p.speed *= 0.92;
+
+        // Adicionado DANO na batida contra outros carros
+        p.health = Math.max(0, p.health - (6 * defenseFactor));
 
         this.cameraShake = 6;
         window.gameAudio.playCarBump();
@@ -1383,7 +1367,7 @@ class GameEngine {
 
       if (dist < 32) {
         this.stats.score = Math.max(0, this.stats.score - 400);
-        p.health = Math.max(0, p.health - 15);
+        p.health = Math.max(0, p.health - (15 * defenseFactor));
         p.speed *= 0.6;
         this.cameraShake = 10;
         window.gameAudio.playImpact();
@@ -1409,7 +1393,7 @@ class GameEngine {
           window.gameAudio.playFuelPickup();
           this.showAlert("⛽ Bio-Combustível Abastecido! (+40%) 🌿");
         } else if (c.type === 'repair') {
-          p.health = Math.min(p.maxHealth, p.health + (p.maxHealth * 0.3));
+          p.health = Math.min(p.maxHealth, p.health + (p.maxHealth * 0.35));
           this.stats.score += 50;
           window.gameAudio.playPowerup();
           this.showAlert("🔧 Veículo Reparado na Trilha!");
@@ -1423,7 +1407,6 @@ class GameEngine {
       }
     }
   }
-
   // ==========================================
   // ATUALIZAÇÃO DO HUD & MINI-MAPA
   // ==========================================
@@ -1500,7 +1483,7 @@ class GameEngine {
 
     ctx.save();
     if (this.cameraShake > 0) {
-      ctx.translate((Math.random() - 0.5) * this.cameraShake, (Math.random() - 0.5) * this.cameraShake);
+      ctx.translate((Math.random() - 0.2) * this.cameraShake, (Math.random() - 0.5) * this.cameraShake);
     }
 
     const stg = this.STAGES[this.currentStage];
@@ -1524,7 +1507,7 @@ class GameEngine {
     ctx.fillRect(roadCenter - 250, 0, 500, this.height);
 
     // 3. Pista Principal com Curvas Sinuosas
-    this.roadScrollY = (this.roadScrollY + this.player.speed * 0.25) % 80;
+    this.roadScrollY = (this.roadScrollY + this.player.speed * 0.25) % 100;
     ctx.fillStyle = stg.roadColor;
     ctx.fillRect(roadCenter - 200, 0, 400, this.height);
 
@@ -1537,8 +1520,8 @@ class GameEngine {
       ctx.lineWidth = 3;
       for (let by = 0; by < this.height; by += 40) {
         ctx.beginPath();
-        ctx.moveTo(roadCenter - 260, by);
-        ctx.lineTo(roadCenter - 195, by + 15);
+        ctx.moveTo(roadCenter - 230, by);
+        ctx.lineTo(roadCenter - 140, by + 15);
         ctx.stroke();
       }
 
@@ -1547,8 +1530,8 @@ class GameEngine {
       ctx.fillRect(roadCenter + 195, 0, 65, this.height);
       for (let by = 0; by < this.height; by += 40) {
         ctx.beginPath();
-        ctx.moveTo(roadCenter + 260, by);
-        ctx.lineTo(roadCenter + 195, by + 15);
+        ctx.moveTo(roadCenter + 230, by);
+        ctx.lineTo(roadCenter + 140, by + 15);
         ctx.stroke();
       }
     }

@@ -1,0 +1,53 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Press Start 2P', monospace;
+    }
+
+  body {
+      background-color: #467746; /* Verde musgo escuro */
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      color: #ffbd03;
+      text-shadow: 4px 4px #7a0000;
+      line-height: 1.4;
+    }
+
+    .btn-play {
+      background-color: #39e642;
+      color: #fff;
+      border: 4px solid #fff;
+      padding: 18px 36px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 6px 6px 0px #000;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .btn-play:hover {
+      background-color: #ffbd03;
+      color: #000;
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0px #000;
+    }
+
+    .btn-play:active {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0px #000;
+    }
