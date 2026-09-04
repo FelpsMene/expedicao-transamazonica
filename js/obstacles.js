@@ -127,7 +127,7 @@ class ObstacleManager {
             y: -90,
             width: 45 + Math.random() * 25,
             height: 35 + Math.random() * 20,
-            damage: 22
+            damage: 15
           });
         } else if (rand < 0.75) {
           // Atoleiro denso
@@ -147,7 +147,7 @@ class ObstacleManager {
             y: -80,
             width: 48,
             height: 38,
-            damage: 20
+            damage: 15
           });
         }
       }

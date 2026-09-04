@@ -381,7 +381,7 @@ const VEHICLES = {
     ability: 'Casco Pesado & Buzina a Ar: Destrói pequenos obstáculos e afasta animais a longa distância.',
     width: 48,
     height: 94,
-    maxSpeed: 70,
+    maxSpeed: 50,
     accel: 0.8,
     brake: 0.28,
     handling: 2.7,

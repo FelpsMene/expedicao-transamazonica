@@ -1258,7 +1258,7 @@ checkCollisions(delta) {
         }
       } else if (h.type === 'barranco_rock') {
         if (dist < (h.width/2 + car.width/3)) {
-          let baseDmg = (h.damage || 22) * defenseFactor;
+          let baseDmg = (h.damage || 5) * defenseFactor;
           if (car.id === 'fusca') baseDmg *= 0.5; // Habilidade Baja
 
           p.health = Math.max(0, p.health - baseDmg);
@@ -1290,17 +1290,17 @@ checkCollisions(delta) {
         }
       } else if (h.type === 'stuck_truck') {
         if (Math.abs(h.x - p.x) < (h.width/2 + car.width/2) && Math.abs(h.y - p.y) < 38) {
-          let baseDmg = (h.damage || 40) * defenseFactor;
+          let baseDmg = (h.damage || 10) * defenseFactor;
           p.health = Math.max(0, p.health - baseDmg);
           p.speed *= 0.3;
-          this.cameraShake = 14;
+          this.cameraShake = 7;
           window.gameAudio.playImpact();
           this.obstacleManager.hazards.splice(i, 1);
           this.showAlert("💥 BATEU NO CAMINHÃO ATOLADO!");
         }
       } else if (h.type === 'pothole' || h.type === 'bridge_hole') {
         if (dist < (h.width/2 + car.width/4)) {
-          let baseDmg = (h.damage || 18) * defenseFactor;
+          let baseDmg = (h.damage || 10) * defenseFactor;
           if (car.id === 'fusca') baseDmg *= 0.5;
 
           p.health = Math.max(0, p.health - baseDmg);
@@ -1318,10 +1318,10 @@ checkCollisions(delta) {
             window.gameAudio.playImpact();
             this.showAlert("🪵 Caminhão MB 1113 Esmagou o Tronco!");
           } else {
-            let baseDmg = (h.damage || 30) * defenseFactor;
+            let baseDmg = (h.damage || 9) * defenseFactor;
             p.health = Math.max(0, p.health - baseDmg);
             p.speed *= 0.4;
-            this.cameraShake = 12;
+            this.cameraShake = 6;
             window.gameAudio.playImpact();
             this.obstacleManager.hazards.splice(i, 1);
             this.showAlert("⚠️ Impacto com Tronco Caído!");
@@ -1348,7 +1348,7 @@ checkCollisions(delta) {
         p.speed *= 0.92;
 
         // Adicionado DANO na batida contra outros carros
-        p.health = Math.max(0, p.health - (6 * defenseFactor));
+        p.health = Math.max(0, p.health - (2 * defenseFactor));
 
         this.cameraShake = 6;
         window.gameAudio.playCarBump();
