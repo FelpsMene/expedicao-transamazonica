@@ -803,7 +803,7 @@ class GameEngine {
     window.gameAudio.playHorn(this.currentCarData.id);
 
     if (this.currentCarData.id === 'uno' && this.player.boostTimer <= 0 && this.currentState === this.STATE.PLAYING) {
-      this.player.boostTimer = 4.0;
+      this.player.boostTimer = 1.0;
       this.player.isBoosting = true;
       window.gameAudio.playPowerup();
       this.showAlert("⚡ MODO FIRMA ATIVADO! SUPERROTAÇÃO!");

@@ -15,10 +15,10 @@
 
 | Veículo | Categoria | Habilidade Especial |
 | :--- | :--- | :--- |
-| 🚗 **Uno Mille com Escada** | O Lendário | **Modo Firma**: Super Nitro com chama ao pressionar Espaço! |
-| 🚙 **Fusca Baja 1974** | O Valente | **Suspensão Reforçada**: 50% de resistência extra a crateras. |
-| 🛻 **Camionete D20 Raiz** | Força Bruta | **Tração 4x4**: Estabilidade pesada e caçamba de carga. |
-| 🚜 **Jeep Willys 1960** | Rei da Lama | **Reduzida Willys**: Imunidade quase total a atoleiros de barro. |
+| 🚗 **Uno com Escada** | O Lendário | **Modo Firma**: Super Nitro com chama ao pressionar Espaço! |
+| 🚙 **Fuscão** | O Valente | **Suspensão Reforçada**: 50% de resistência extra a crateras. |
+| 🛻 **Camionete Raiz** | Força Bruta | **Tração 4x4**: Estabilidade pesada e caçamba de carga. |
+| 🚜 **Jeep 1960** | Rei da Lama | **Reduzida Willys**: Imunidade quase total a atoleiros de barro. |
 | 🚛 **Caminhão MB 1113** | Gigante da BR | **Buzina a Ar & Casco**: Esmaga troncos e afasta animais de longe. |
 
 ---
