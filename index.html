@@ -19,11 +19,17 @@
         <h1>RALLY <span>TRANSAMAZÔNICA</span></h1>
       </div>
       <div class="header-controls">
+        <button id="btn-fullscreen" class="btn-icon" title="Modo Tela Cheia" aria-label="Tela Cheia">
+          ⛶
+        </button>
         <button id="btn-sound" class="btn-icon" title="Ativar/Desativar Som" aria-label="Som">
           🔊
         </button>
-        <button id="btn-info" class="btn-icon" title="Sobre a Corrida e a Amazônia" aria-label="Informações">
-          ℹ️
+        <button id="btn-records" class="btn-icon" title="Placar de Recordes e Pontos" aria-label="Pontos">
+          🏆
+        </button>
+        <button id="btn-info" class="btn-icon" title="Guia do Piloto e Dicas da Transamazônica" aria-label="Guia">
+          📖
         </button>
       </div>
     </header>
@@ -44,7 +50,9 @@
 
       <!-- Efeitos Climáticos / Efeitos de Tela -->
       <div id="mud-splatter" class="screen-fx"></div>
+      <div id="dirty-mud-splatter" class="screen-fx"></div>
       <div id="rain-overlay" class="screen-fx"></div>
+      <div id="fog-overlay" class="screen-fx"></div>
       <div id="flash-overlay" class="screen-fx"></div>
 
       <!-- HUD Dinâmico Sobreposto no Canvas (Modo Corrida) -->
@@ -62,7 +70,7 @@
           <!-- Mini-Mapa da Corrida (Posição dos 5 Carros) -->
           <div class="hud-card race-track-card">
             <div class="track-header">
-              <span>LARGADA</span>
+              <span id="stage-badge-hud" class="badge-road" style="font-size: 0.65rem; padding: 1px 6px;">FASE 1</span>
               <span id="checkpoint-text">Trecho BR-230 • 0.0 km</span>
               <span>CHEGADA 🏁</span>
             </div>
@@ -76,21 +84,27 @@
             </div>
           </div>
 
-          <!-- Mudas Salvas (Pontuação Ecológica) -->
-          <div class="hud-card eco-card">
-            <span class="hud-label">MUDAS COLETADAS</span>
-            <span class="hud-value"><span id="seed-counter">0</span> 🌱</span>
+          <!-- Mudas & Botão de Menu In-Game -->
+          <div class="hud-right-group">
+            <div class="hud-card eco-card">
+              <span class="hud-label">MUDAS</span>
+              <span class="hud-value"><span id="seed-counter">0</span> 🌱</span>
+            </div>
+            <button id="btn-hud-pause" class="btn-icon hud-pause-btn" title="Pausar / Menu">
+              ⏸️
+            </button>
           </div>
         </div>
 
         <div class="hud-bottom">
-          <!-- Velocímetro e Marcha/Tração -->
+          <!-- Velocímetro, Marcha/Tração e Relevo (Subida/Descida) -->
           <div class="hud-card speed-card">
             <div class="speed-digital">
               <span id="speed-val">0</span>
               <span class="unit">KM/H</span>
             </div>
-            <div id="traction-warning" class="status-pill status-normal">PISTA SECA</div>
+            <div id="traction-warning" class="status-pill status-normal">PISTA LIVRE</div>
+            <div id="slope-indicator" class="slope-pill slope-flat">↔️ PISTA PLANA</div>
           </div>
 
           <!-- Indicadores de Combustível e Integridade -->
@@ -140,8 +154,39 @@
       <div id="menu-screen" class="overlay-screen">
         <div class="menu-content">
           <div class="menu-header">
-            <h2>ESCOLHA SEU VEÍCULO PARA O RALLY BR-230</h2>
-            <p>Dispute o 1º lugar contra os maiores mitos do automobilismo brasileiro na Transamazônica!</p>
+            <h2>ESCOLHA SEU VEÍCULO E ETAPA DA BR-230</h2>
+            <p>Dispute o pódio (1º ao 3º lugar) para desbloquear as próximas rodovias da Amazônia!</p>
+          </div>
+
+          <!-- Seletor de Fases (1 a 4) -->
+          <div class="stage-selector-container">
+            <span class="stage-selector-title">🏆 SELECIONE A ETAPA DO RALLY:</span>
+            <div class="stage-grid">
+              <button class="stage-card stage-active" data-stage="1" id="stage-btn-1">
+                <span class="stage-tag">FASE 1</span>
+                <span class="stage-name">BR-230: Marabá ➔ Altamira</span>
+                <span class="stage-desc">Barro Vermelho & Poeirão (5 km)</span>
+                <span class="stage-status" id="stage-status-1">🔓 DESBLOQUEADA</span>
+              </button>
+              <button class="stage-card stage-locked" data-stage="2" id="stage-btn-2">
+                <span class="stage-tag">FASE 2</span>
+                <span class="stage-name">BR-163 / BR-236: Rurópolis</span>
+                <span class="stage-desc">Grandes Barrancos & Voçorocas (6 km)</span>
+                <span class="stage-status" id="stage-status-2">🔒 PÓDIO NA FASE 1</span>
+              </button>
+              <button class="stage-card stage-locked" data-stage="3" id="stage-btn-3">
+                <span class="stage-tag">FASE 3</span>
+                <span class="stage-name">BR-230 Oeste: Itaituba ➔ Apuí</span>
+                <span class="stage-desc">Atoleiro de Chupeta & Pinguelas (6.5 km)</span>
+                <span class="stage-status" id="stage-status-3">🔒 PÓDIO NA FASE 2</span>
+              </button>
+              <button class="stage-card stage-locked" data-stage="4" id="stage-btn-4">
+                <span class="stage-tag">FASE 4</span>
+                <span class="stage-name">BR-319: Apuí ➔ Humaitá</span>
+                <span class="stage-desc">Trechos Alagados & Dilúvio (7 km)</span>
+                <span class="stage-status" id="stage-status-4">🔒 PÓDIO NA FASE 3</span>
+              </button>
+            </div>
           </div>
 
           <!-- Seletor de Carros / Garagem -->
@@ -212,13 +257,16 @@
         </div>
       </div>
 
-      <!-- TELA DE PAUSA -->
+      <!-- TELA DE PAUSA / MENU EM JOGO -->
       <div id="pause-screen" class="overlay-screen hidden">
-        <div class="modal-card">
-          <h2>CORRIDA PAUSADA</h2>
-          <p>Você encostou no acostamento da BR-230.</p>
-          <div class="modal-buttons">
+        <div class="modal-card pause-card">
+          <h2>CORRIDA PAUSADA ⏸️</h2>
+          <p>Você parou no acostamento da Transamazônica. Escolha uma opção:</p>
+          <div class="modal-buttons pause-buttons-grid">
             <button id="btn-resume" class="btn-primary">CONTINUAR CORRIDA ▶️</button>
+            <button id="btn-pause-restart" class="btn-secondary">REINICIAR ETAPA 🔄</button>
+            <button id="btn-pause-records" class="btn-secondary">PLACAR & RECORDES 🏆</button>
+            <button id="btn-pause-guide" class="btn-secondary">GUIA DO PILOTO 📖</button>
             <button id="btn-quit" class="btn-secondary">VOLTAR À GARAGEM 🚪</button>
           </div>
         </div>
@@ -292,22 +340,77 @@
           </div>
 
           <div class="modal-buttons">
-            <button id="btn-play-again" class="btn-primary">CORRER DE NOVO 🌟</button>
+            <button id="btn-next-stage" class="btn-primary">PRÓXIMA ETAPA ➡️</button>
+            <button id="btn-play-again" class="btn-secondary">CORRER DE NOVO 🌟</button>
             <button id="btn-vic-garage" class="btn-secondary">GARAGEM DE CARROS 🚗</button>
           </div>
         </div>
       </div>
 
-      <!-- MODAL DE INFORMAÇÕES E HISTÓRIA DO JOGO -->
+      <!-- MODAL DE PLACAR DE RECORDES E PONTOS -->
+      <div id="records-modal" class="overlay-screen hidden">
+        <div class="modal-card records-card">
+          <h2>🏆 Galeria de Recordes & Pontuações</h2>
+          <p>Estatísticas do seu histórico pelas rodovias da Amazônia:</p>
+          
+          <div class="records-grid">
+            <div class="stat-box highlight-box">
+              <span class="stat-num" id="rec-high-score">0 pts</span>
+              <span class="stat-label">Maior Pontuação Geral</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="rec-total-seeds">0 🌱</span>
+              <span class="stat-label">Total de Mudas Salvas</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="rec-total-fauna">0 🐆</span>
+              <span class="stat-label">Fauna Preservada</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="rec-unlocked-stages">Fase 1 / 4</span>
+              <span class="stat-label">Progresso da Campanha</span>
+            </div>
+          </div>
+
+          <div class="stage-records-list">
+            <h3>Melhores Tempos por Etapa:</h3>
+            <div class="stage-record-row"><span>Fase 1 (BR-230 Marabá):</span> <strong id="rec-time-1">--:--</strong></div>
+            <div class="stage-record-row"><span>Fase 2 (BR-163 Barrancos):</span> <strong id="rec-time-2">--:--</strong></div>
+            <div class="stage-record-row"><span>Fase 3 (BR-230 Oeste Canaletas):</span> <strong id="rec-time-3">--:--</strong></div>
+            <div class="stage-record-row"><span>Fase 4 (BR-319 Alagados):</span> <strong id="rec-time-4">--:--</strong></div>
+          </div>
+
+          <div class="modal-buttons" style="margin-top: 15px;">
+            <button id="btn-close-records" class="btn-primary">VOLTAR AO JOGO ✖</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL DE GUIA DO PILOTO E EXPLICAÇÕES -->
       <div id="info-modal" class="overlay-screen hidden">
         <div class="modal-card info-card">
-          <h2>🌿 Sobre a Expedição Transamazônica</h2>
+          <h2>📖 Guia do Piloto da Transamazônica</h2>
           <div class="info-content">
-            <p><strong>A Rodovia BR-230 (Transamazônica)</strong> é uma das estradas mais emblemáticas do Brasil. Cortando a densa floresta tropical, ela conecta comunidades isoladas mas enfrenta desafios colossais: chuvas torrenciais, atoleiros de barro vermelho e travessias perigosas de pontes sobre igarapés.</p>
-            <p><strong>🌱 Objetivo Ecológico:</strong> Neste jogo, sua missão vai além da velocidade. Você transporta sementes e mudas nativas para reflorestamento e deve dirigir com consciência ambiental, respeitando os animais que cruzam a pista (antas, capivaras, jacarés e preguiças).</p>
-            <p><strong>🚜 Os Veículos Brasileiros:</strong> Escolha entre ícones automotivos como o clássico <em>Uno Mille com escada</em>, o valente <em>Fusca Baja 1974</em>, a robusta <em>Camionete D20 4x4</em>, o histórico <em>Jeep Willys</em> ou o imponente <em>Caminhão Mercedes-Benz 1113 Trucado</em>!</p>
+            <div class="guide-topic">
+              <h4>⛰️ Relevo da Amazônia (Aclives e Declives):</h4>
+              <p>A topografia da Transamazônica possui subidas e descidas naturais que cortam vales e serras. Nas descidas o carro ganha embalo e nas subidas o ritmo flui naturalmente. Colete os galões de bio-combustível e as mudas nativas espalhadas pela pista para manter sua autonomia e pontuação sempre altas!</p>
+            </div>
+            <div class="guide-topic">
+              <h4>🏎️ Curvas & Força Centrífuga:</h4>
+              <p>A Transamazônica serpenteia a floresta com curvas sinuosas. Solte o acelerador ou freie antes de entrar na curva para não derrapar na terra e bater nos barrancos!</p>
+            </div>
+            <div class="guide-topic">
+              <h4>🚷 Concorrentes Jogando Sujo:</h4>
+              <p>Os rivais não facilitam! Eles <strong>fecham a porta</strong> em ultrapassagens, <strong>jogam spray de lama e pedras</strong> no seu para-brisa e tentam te empurrar contra os barrancos. Desvie lateralmente e use o vácuo com precisão!</p>
+            </div>
+            <div class="guide-topic">
+              <h4>🌫️ Bancos de Neblina & Animais na Pista:</h4>
+              <p>Em trechos de neblina espessa, a visibilidade cai drasticamente. Buzine (ESPAÇO) para alertar onças, antas e capivaras a tempo e ganhar bônus de preservação ambiental!</p>
+            </div>
           </div>
-          <button id="btn-close-info" class="btn-primary">FECHAR ✖</button>
+          <div class="modal-buttons">
+            <button id="btn-close-info" class="btn-primary">ENTENDIDO! VOLTAR AO RALLY ✖</button>
+          </div>
         </div>
       </div>
     </div>

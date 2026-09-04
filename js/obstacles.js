@@ -23,7 +23,7 @@ class ObstacleManager {
     this.totalDistance = 0;
   }
 
-  update(speed, delta, roadCurvature, isBridgeZone, weather) {
+  update(speed, delta, roadCurvature, isBridgeZone, weather, currentStage = 1) {
     const moveDist = speed * delta * 15;
     this.totalDistance += moveDist;
 
@@ -31,7 +31,7 @@ class ObstacleManager {
     for (let i = this.hazards.length - 1; i >= 0; i--) {
       const h = this.hazards[i];
       h.y += moveDist;
-      if (h.y > 700) {
+      if (h.y > 750) {
         this.hazards.splice(i, 1);
       }
     }
@@ -46,7 +46,7 @@ class ObstacleManager {
       w.animTimer = (w.animTimer || 0) + delta * 8;
 
       // Saiu da tela
-      if (w.y > 700 || w.x < -100 || w.x > 900) {
+      if (w.y > 750 || w.x < -100 || w.x > 900) {
         this.wildlife.splice(i, 1);
       }
     }
@@ -56,7 +56,7 @@ class ObstacleManager {
       const c = this.collectibles[i];
       c.y += moveDist;
       c.pulse = (c.pulse || 0) + delta * 5;
-      if (c.y > 700) {
+      if (c.y > 750) {
         this.collectibles.splice(i, 1);
       }
     }
@@ -73,23 +73,23 @@ class ObstacleManager {
       }
     }
 
-    // Spawn Procedural baseado na distância
+    // Spawn Procedural baseado na distância e na Fase
     this.spawnTimer += delta;
-    if (this.spawnTimer > 1.2) {
+    const spawnThreshold = currentStage >= 3 ? 1.0 : 1.2;
+    if (this.spawnTimer > spawnThreshold) {
       this.spawnTimer = 0;
-      this.spawnWave(isBridgeZone, weather);
+      this.spawnWave(isBridgeZone, weather, currentStage);
     }
   }
 
-  spawnWave(isBridgeZone, weather) {
+  spawnWave(isBridgeZone, weather, currentStage = 1) {
     const roadLeft = 200;
     const roadRight = 600;
     const roadCenter = 400;
 
-    // Se estiver em ponte estreita de igarapé
+    // Se estiver em ponte estreita de igarapé / pinguela
     if (isBridgeZone) {
       if (Math.random() < 0.4) {
-        // Tábua solta ou buraco na ponte
         this.hazards.push({
           type: 'bridge_hole',
           x: roadCenter + (Math.random() * 120 - 60),
@@ -99,7 +99,6 @@ class ObstacleManager {
         });
       }
       if (Math.random() < 0.5) {
-        // Muda ecológica na ponte
         this.collectibles.push({
           type: 'seed',
           x: roadCenter + (Math.random() * 100 - 50),
@@ -110,47 +109,150 @@ class ObstacleManager {
       return;
     }
 
-    // Spawn de Terreno (Atoleiro de barro ou Buraco)
-    const hazardChance = weather === 'rain' ? 0.85 : 0.65;
-    if (Math.random() < hazardChance) {
-      const rand = Math.random();
-      const hX = roadLeft + 40 + Math.random() * (roadRight - roadLeft - 80);
+    // SPAWN DE PERIGOS ESPECÍFICOS DE CADA FASE:
+    const hazardChance = (weather === 'rain' || currentStage >= 3) ? 0.88 : 0.70;
 
-      if (rand < 0.55) {
-        // Atoleiro de Barro Vermelho
-        this.hazards.push({
-          type: 'mud',
-          x: hX,
-          y: -120,
-          width: 90 + Math.random() * 60,
-          height: 80 + Math.random() * 50,
-          viscosity: 0.6 + Math.random() * 0.3
-        });
-      } else if (rand < 0.85) {
-        // Cratera / Buraco de Chuva
-        this.hazards.push({
-          type: 'pothole',
-          x: hX,
-          y: -80,
-          width: 48,
-          height: 38,
-          damage: 18
-        });
-      } else {
-        // Tronco Caído
-        this.hazards.push({
-          type: 'log',
-          x: hX,
-          y: -80,
-          width: 100,
-          height: 28,
-          damage: 30
-        });
+    if (Math.random() < hazardChance) {
+      const hX = roadLeft + 40 + Math.random() * (roadRight - roadLeft - 80);
+      const rand = Math.random();
+
+      // FASE 2: BR-163 / BR-236 (Grandes Barrancos e Deslizamentos)
+      if (currentStage === 2) {
+        if (rand < 0.45) {
+          // Desmoronamento de Barranco / Pedras e Terra
+          const isFromSide = Math.random() < 0.5;
+          this.hazards.push({
+            type: 'barranco_rock',
+            x: isFromSide ? (roadLeft + 25 + Math.random() * 50) : (roadRight - 25 - Math.random() * 50),
+            y: -90,
+            width: 45 + Math.random() * 25,
+            height: 35 + Math.random() * 20,
+            damage: 22
+          });
+        } else if (rand < 0.75) {
+          // Atoleiro denso
+          this.hazards.push({
+            type: 'mud',
+            x: hX,
+            y: -120,
+            width: 100 + Math.random() * 50,
+            height: 80 + Math.random() * 50,
+            viscosity: 0.65
+          });
+        } else {
+          // Cratera
+          this.hazards.push({
+            type: 'pothole',
+            x: hX,
+            y: -80,
+            width: 48,
+            height: 38,
+            damage: 20
+          });
+        }
+      }
+      // FASE 3: BR-230 Oeste (Atoleiro de Chupeta & Canaletas Profundas)
+      else if (currentStage === 3) {
+        if (rand < 0.45) {
+          // Canaleta / Vala Profunda de Pneu de Carreta
+          this.hazards.push({
+            type: 'canaleta',
+            x: roadCenter + (Math.random() < 0.5 ? -70 : 70),
+            y: -150,
+            width: 48,
+            height: 150 + Math.random() * 80,
+            damage: 5
+          });
+        } else if (rand < 0.75) {
+          // Atoleiro de Chupeta (Super viscoso)
+          this.hazards.push({
+            type: 'mud',
+            x: hX,
+            y: -130,
+            width: 120 + Math.random() * 60,
+            height: 90 + Math.random() * 60,
+            viscosity: 0.50 // Mais pesado que o normal!
+          });
+        } else {
+          // Tronco caído
+          this.hazards.push({
+            type: 'log',
+            x: hX,
+            y: -80,
+            width: 110,
+            height: 28,
+            damage: 32
+          });
+        }
+      }
+      // FASE 4: BR-319 / Humaitá (Trechos Alagados & Caminhão Atolado)
+      else if (currentStage === 4) {
+        if (rand < 0.40) {
+          // Trecho Alagado / Igarapé Transbordado
+          this.hazards.push({
+            type: 'flood_water',
+            x: roadCenter,
+            y: -140,
+            width: 380,
+            height: 130 + Math.random() * 40
+          });
+        } else if (rand < 0.65) {
+          // Caminhão de Carga Atolado no meio da pista
+          this.hazards.push({
+            type: 'stuck_truck',
+            x: roadLeft + 60 + Math.random() * (roadRight - roadLeft - 120),
+            y: -120,
+            width: 52,
+            height: 88,
+            damage: 30
+          });
+        } else {
+          // Atoleiro gigante
+          this.hazards.push({
+            type: 'mud',
+            x: hX,
+            y: -130,
+            width: 130 + Math.random() * 60,
+            height: 100 + Math.random() * 50,
+            viscosity: 0.30
+          });
+        }
+      }
+      // FASE 1: Padrão
+      else {
+        if (rand < 0.55) {
+          this.hazards.push({
+            type: 'mud',
+            x: hX,
+            y: -120,
+            width: 90 + Math.random() * 60,
+            height: 80 + Math.random() * 50,
+            viscosity: 0.6
+          });
+        } else if (rand < 0.85) {
+          this.hazards.push({
+            type: 'pothole',
+            x: hX,
+            y: -80,
+            width: 48,
+            height: 38,
+            damage: 18
+          });
+        } else {
+          this.hazards.push({
+            type: 'log',
+            x: hX,
+            y: -80,
+            width: 100,
+            height: 28,
+            damage: 30
+          });
+        }
       }
     }
 
     // Spawn de Fauna Amazônica
-    if (Math.random() < 0.40) {
+    if (Math.random() < 0.35) {
       const speciesList = ['capivara', 'anta', 'jacare', 'preguica'];
       const chosen = speciesList[Math.floor(Math.random() * speciesList.length)];
       const fromLeft = Math.random() < 0.5;
@@ -174,16 +276,17 @@ class ObstacleManager {
       });
     }
 
-    // Spawn de Coletáveis (Mudas, Combustível, Reparos, Pranchas)
-    if (Math.random() < 0.65) {
-      const cX = roadLeft + 30 + Math.random() * (roadRight - roadLeft - 60);
+    // Spawn de Coletáveis (Mudas, Bio-Combustível, Reparos, Pranchas)
+    if (Math.random() < 0.85) {
+      const cX = roadLeft + 35 + Math.random() * (roadRight - roadLeft - 70);
       const randC = Math.random();
       let type = 'seed';
 
-      if (randC < 0.55) type = 'seed';       // Muda de castanheira (+pontos)
-      else if (randC < 0.80) type = 'fuel';   // Galão de bio-combustível
-      else if (randC < 0.92) type = 'repair'; // Caixa de ferramentas
-      else type = 'plank';                    // Pranchas de desatolamento
+      // Distribuição equilibrada: mudas e combustíveis espalhados com frequência
+      if (randC < 0.45) type = 'seed';
+      else if (randC < 0.82) type = 'fuel';
+      else if (randC < 0.93) type = 'repair';
+      else type = 'plank'; // Pranchas nos atoleiros
 
       this.collectibles.push({
         type: type,
@@ -191,6 +294,20 @@ class ObstacleManager {
         y: -100,
         radius: 16
       });
+
+      // Ocasionalmente spawna par complementar (muda + combustível) em pistas diferentes
+      if (Math.random() < 0.35) {
+        const otherType = (type === 'fuel') ? 'seed' : 'fuel';
+        const otherX = (cX > roadCenter) 
+          ? (roadLeft + 35 + Math.random() * 120) 
+          : (roadRight - 35 - Math.random() * 120);
+        this.collectibles.push({
+          type: otherType,
+          x: otherX,
+          y: -145,
+          radius: 16
+        });
+      }
     }
   }
 
@@ -220,6 +337,40 @@ class ObstacleManager {
         life: 1.0
       });
     }
+  }
+
+  // Spray sujo de barro e pedregulhos arremessados pelos rivais
+  addDirtySpray(x, y) {
+    for (let i = 0; i < 7; i++) {
+      this.particles.push({
+        x: x + (Math.random() * 24 - 12),
+        y: y,
+        vx: (Math.random() - 0.5) * 5,
+        vy: 3 + Math.random() * 6,
+        size: 5 + Math.random() * 7,
+        color: Math.random() < 0.5 ? '#4a1505' : '#1f0800',
+        life: 0.8,
+        isDirtyMud: true
+      });
+    }
+  }
+
+  // Animal surpresa que surge dentro do banco de neblina espessa
+  spawnFogWildlife(roadCenterX) {
+    const species = ['onca', 'anta', 'capivara'];
+    const chosen = species[Math.floor(Math.random() * species.length)];
+    this.wildlife.push({
+      type: chosen === 'onca' ? 'anta' : chosen, // onça usa sprite estilizado ou anta
+      x: roadCenterX + (Math.random() * 100 - 50),
+      y: -60,
+      width: 44,
+      height: 38,
+      vx: (Math.random() < 0.5 ? 0.6 : -0.6),
+      alerted: false,
+      respected: false,
+      animTimer: 0,
+      inFog: true
+    });
   }
 
   // ==========================================
@@ -276,6 +427,81 @@ class ObstacleManager {
         // Musgo amazônico no tronco
         ctx.fillStyle = '#27ae60';
         ctx.fillRect(h.x - h.width/3, h.y - h.height/2, h.width/2, 4);
+        ctx.restore();
+      } else if (h.type === 'barranco_rock') {
+        // Pedregulhos e Terra de Desmoronamento de Barranco (Fase 2)
+        ctx.save();
+        ctx.fillStyle = '#8b2500';
+        ctx.beginPath();
+        ctx.ellipse(h.x, h.y, h.width/2, h.height/2, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        // Rochas angulares
+        ctx.fillStyle = '#4a1505';
+        ctx.beginPath();
+        ctx.moveTo(h.x - h.width/3, h.y + h.height/4);
+        ctx.lineTo(h.x, h.y - h.height/3);
+        ctx.lineTo(h.x + h.width/4, h.y + h.height/3);
+        ctx.fill();
+        ctx.strokeStyle = '#d35400';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      } else if (h.type === 'canaleta') {
+        // Vala Profunda / Trilho de Pneu no Barro (Fase 3)
+        ctx.save();
+        ctx.fillStyle = '#3a0c02';
+        ctx.beginPath();
+        ctx.roundRect(h.x - h.width/2, h.y - h.height/2, h.width, h.height, 8);
+        ctx.fill();
+        // Fundo com lama negra
+        ctx.fillStyle = '#1a0400';
+        ctx.fillRect(h.x - h.width/4, h.y - h.height/2 + 6, h.width/2, h.height - 12);
+        // Frisos de roda
+        ctx.strokeStyle = '#5a1505';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(h.x - h.width/2, h.y - h.height/2, h.width, h.height);
+        ctx.restore();
+      } else if (h.type === 'flood_water') {
+        // Igarapé Transbordado / Trecho Alagado (Fase 4)
+        ctx.save();
+        ctx.fillStyle = 'rgba(41, 128, 185, 0.65)';
+        ctx.beginPath();
+        ctx.roundRect(h.x - h.width/2, h.y - h.height/2, h.width, h.height, 12);
+        ctx.fill();
+        // Ondulações de correnteza
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 2;
+        for (let wy = -h.height/3; wy <= h.height/3; wy += 20) {
+          ctx.beginPath();
+          ctx.moveTo(h.x - h.width/2.5, h.y + wy);
+          ctx.quadraticCurveTo(h.x, h.y + wy + 8, h.x + h.width/2.5, h.y + wy);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if (h.type === 'stuck_truck') {
+        // Caminhão Antigo Atolado na Lama (Fase 4)
+        ctx.save();
+        ctx.translate(h.x, h.y);
+        // Sombra / poça de lama em volta
+        ctx.fillStyle = '#2c0b02';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, h.width/1.2 + 10, h.height/2 + 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Cabine verde musgo enferrujada
+        ctx.fillStyle = '#34495e';
+        ctx.fillRect(-h.width/2, -h.height/2, h.width, 34);
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(-h.width/2 + 4, -h.height/2 + 6, h.width - 8, 10); // para-brisa
+        // Caçamba de madeira velha
+        ctx.fillStyle = '#5c3a21';
+        ctx.fillRect(-h.width/2 + 2, -h.height/2 + 34, h.width - 4, h.height - 36);
+        // Triângulo de alerta de perigo atrás
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.moveTo(0, h.height/2 - 12);
+        ctx.lineTo(-8, h.height/2 - 2);
+        ctx.lineTo(8, h.height/2 - 2);
+        ctx.fill();
         ctx.restore();
       }
     }
